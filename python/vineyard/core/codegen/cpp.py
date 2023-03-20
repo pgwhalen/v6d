@@ -98,8 +98,7 @@ construct_meth_tpl = '''
         VINEYARD_ASSERT(
             meta.GetTypeName() == __type_name,
             "Expect typename '" + __type_name + "', but got '" + meta.GetTypeName() + "'");
-        this->meta_ = meta;
-        this->id_ = meta.GetId();
+        Object::Construct(meta);
 
         {construct_body}
 
@@ -269,35 +268,29 @@ class {class_name}BaseBuilder{type_params}: public ObjectBuilder {{
         return __value->meta_;
     }}
 
-    std::shared_ptr<Object> _Seal(Client &client) override {{
+    Status _Seal(Client& client, std::shared_ptr<Object>& object) override {{
         // ensure the builder hasn't been sealed yet.
         ENSURE_NOT_SEALED(this);
 
-        VINEYARD_CHECK_OK(this->Build(client));
+        RETURN_ON_ERROR(this->Build(client));
         auto __value = std::make_shared<{class_name_elaborated}>();
+        object = __value;
 
-        return this->_Seal(client, __value);
-    }}
-
-    std::shared_ptr<Object> _Seal(Client &client, std::shared_ptr<{class_name_elaborated}> &__value) {{
         size_t __value_nbytes = 0;
 
         __value->meta_.SetTypeName(type_name<{class_name_elaborated}>());
-        if (std::is_base_of<GlobalObject, {class_name_elaborated}>::value) {{
-            __value->meta_.SetGlobal(true);
-        }}
 
         {assignments}
 
         __value->meta_.SetNBytes(__value_nbytes);
 
-        VINEYARD_CHECK_OK(client.CreateMetaData(__value->meta_, __value->id_));
+        RETURN_ON_ERROR(client.CreateMetaData(__value->meta_, __value->id_));
 
         // mark the builder as sealed
         this->set_sealed(true);
 
         {post_construct}
-        return std::static_pointer_cast<Object>(__value);
+        return Status::OK();
     }}
 
     Status Build(Client &client) override {{
@@ -343,6 +336,11 @@ def codegen_field_declare(field_name, field_type, spec):
 field_assign_meta_tpl = '''
         __value->{field_name} = {field_name};
         __value->meta_.AddKeyValue("{field_name}", __value->{field_name});
+'''
+
+field_assign_meta_explicit_cast_tpl = '''
+        __value->{field_name} = {field_name};
+        __value->meta_.AddKeyValue("{field_name}", {value_type}(__value->{field_name}));
 '''
 
 field_assign_plain_tpl = '''
@@ -433,8 +431,13 @@ field_assign_dict_tpl = '''
 
 
 def codegen_field_assign(field_name, field_type, spec):
+    value_type = 'std::nullptr_t'
     if spec.is_meta:
-        tpl = field_assign_meta_tpl
+        if field_type == 'vineyard::String':
+            tpl = field_assign_meta_explicit_cast_tpl
+            value_type = 'std::string'
+        else:
+            tpl = field_assign_meta_tpl
     if spec.is_plain:
         tpl = field_assign_plain_tpl
     if spec.is_list:
@@ -454,6 +457,7 @@ def codegen_field_assign(field_name, field_type, spec):
     return tpl.format(
         field_name=field_name,
         field_type=field_type,
+        value_type=value_type,
         deref=spec.deref,
         element_type=element_type,
         element_type_name=element_type_name,
@@ -658,13 +662,13 @@ def codegen_field_get_assign(field_name, spec):
     return tpl.format(field_name=field_name)
 
 
-using_alia_tpl = '''
-    // using {alia}
+using_alias_tpl = '''
+    // using {alias}
     {extent};'''
 
 
-def codegen_using_alia(alia, extent):
-    return using_alia_tpl.format(alia=alia, extent=extent)
+def codegen_using_alias(alias, extent):
+    return using_alias_tpl.format(alias=alias, extent=extent)
 
 
 post_construct_in_seal_tpl = '''
@@ -688,9 +692,9 @@ def codegen_base_builder(
     setters = []
     using_alias_statements = []
 
-    # genreate using alias
-    for alia, extent in using_alias_values:
-        using_alias_statements.append(codegen_using_alia(alia, extent))
+    # generate using alias
+    for alias, extent in using_alias_values:
+        using_alias_statements.append(codegen_using_alias(alias, extent))
 
     # core field assignment
     for field in fields:

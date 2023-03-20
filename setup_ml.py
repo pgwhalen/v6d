@@ -85,13 +85,8 @@ setup(
     packages=find_ml_packages('python'),
     cmdclass={'bdist_wheel': bdist_wheel_plat, 'install': install_plat},
     zip_safe=False,
-    install_requires=['vineyard', 'tensorflow', 'xgboost', 'torch', 'mxnet'],
-    extras_require={
-        'cuda': [
-            'nvidia-dali-cuda110',
-        ],
-    },
-    platform=['POSIX', 'MacOS'],
+    install_requires=['vineyard'],
+    platforms=['POSIX', 'MacOS'],
     license="Apache License 2.0",
     classifiers=[
         "Development Status :: 5 - Production/Stable",

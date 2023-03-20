@@ -378,7 +378,8 @@ class Client final : public BasicIPCClient,
   /**
    * @brief Create a blob in vineyard server. When creating a blob, vineyard
    * server's bulk allocator will prepare a block of memory of the requested
-   * size, the map the memory to client's process to share the allocated memory.
+   * size, then map the memory to client's process to share the allocated
+   * memory.
    *
    * @param size The size of requested blob.
    * @param blob The result mutable blob will be set in `blob`.
@@ -467,7 +468,7 @@ class Client final : public BasicIPCClient,
 
   /**
    * @brief Pull a chunk from a stream. When there's no more chunk available in
-   * the stream, i.e., the stream has been stoped, a status code
+   * the stream, i.e., the stream has been stopped, a status code
    * `kStreamDrained` or `kStreamFinish` will be returned, otherwise the reader
    * will be blocked until writer creates a new chunk in the stream.
    *
@@ -798,7 +799,7 @@ class Client final : public BasicIPCClient,
    * @return Status that indicates whether the get action has succeeded.
    */
   Status GetGPUBuffers(const std::set<ObjectID>& ids, const bool unsafe,
-                       std::map<ObjectID, GPUUnifiedAddress>& guas);
+                       std::map<ObjectID, GPUUnifiedAddress>& GUAs);
 
  protected:
   /**
@@ -981,7 +982,7 @@ class PlasmaClient final
   Status OnRelease(PlasmaID const& id);
 
   /**
-   * @brief Required by `UsageTracker`. Deletion will be defered until its
+   * @brief Required by `UsageTracker`. Deletion will be deferred until its
    * reference count reaches zero.
    */
   Status OnDelete(PlasmaID const& id);

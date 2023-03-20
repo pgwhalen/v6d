@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.3)
 
 set(VINEYARD_MAJOR_VERSION 0)
-set(VINEYARD_MINOR_VERSION 12)
-set(VINEYARD_PATCH_VERSION 2)
+set(VINEYARD_MINOR_VERSION 13)
+set(VINEYARD_PATCH_VERSION 3)
 set(VINEYARD_VERSION ${VINEYARD_MAJOR_VERSION}.${VINEYARD_MINOR_VERSION}.${VINEYARD_PATCH_VERSION})
 
 message(STATUS "Configuring and building vineyard version '${VINEYARD_VERSION}'.")
@@ -19,7 +19,7 @@ if(POLICY CMP0069)
     cmake_policy(SET CMP0069 NEW)
     set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 endif()
-    
+
 project(vineyard LANGUAGES C CXX VERSION ${VINEYARD_VERSION})
 
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
@@ -27,7 +27,6 @@ option(USE_STATIC_BOOST_LIBS "Build with static-linked boost libraries" OFF)
 option(USE_EXTERNAL_ETCD_LIBS "Build with external etcd-cpp-apiv3 library rather than the submodule one" OFF)
 option(USE_EXTERNAL_REDIS_LIBS "Build with external redis-plus-plus library rather than the submodule one" ON)
 option(USE_EXTERNAL_HIREDIS_LIBS "Build with external hiredis library rather than the submodule one" ON)
-option(USE_EXTERNAL_NLOHMANN_JSON_LIBS "Build with external nlohmann-json library rather than the submodule one" ON)
 option(VINEYARD_USE_ASAN "Using address sanitizer to check memory accessing" OFF)
 option(VINEYARD_USE_LTO "Using IPO/LTO support for link-time optimization" OFF)
 option(USE_LIBUNWIND "Using libunwind to retrieve the stack backtrace when exception occurs" ON)
@@ -36,7 +35,7 @@ option(USE_JSON_DIAGNOSTICS "Using json diagnostics to check the validity of met
 option(USE_GPU "Using gpu support" OFF)
 
 option(BUILD_VINEYARD_SERVER "Build vineyard's server" ON)
-option(BUILD_VINEYARD_SERVER_REDIS "Enable redis as the metadta backend" OFF)
+option(BUILD_VINEYARD_SERVER_REDIS "Enable redis as the metadata backend" OFF)
 option(BUILD_VINEYARD_CLIENT "Build vineyard's client" ON)
 option(BUILD_VINEYARD_CLIENT_VERBOSE "Build vineyard's client with the most verbose logs" OFF)
 option(BUILD_VINEYARD_PYTHON_BINDINGS "Build vineyard's python bindings" ON)
@@ -47,6 +46,7 @@ option(BUILD_VINEYARD_JAVA "Build vineyard's java SDK" OFF)
 option(BUILD_VINEYARD_BASIC "Build vineyard's basic data structures" ON)
 option(BUILD_VINEYARD_IO "Enable vineyard's IOAdaptor support" ON)
 option(BUILD_VINEYARD_GRAPH "Enable vineyard's graph data structures" ON)
+option(BUILD_VINEYARD_GRAPH_WITH_GAR "Building vineyard's graph data with GraphAr support" OFF)
 option(BUILD_VINEYARD_MALLOC "Build vineyard's implementation for client-side malloc" ON)
 option(BUILD_VINEYARD_MALLOC_OVERRIDE "Using the client-side malloc to override the default ones" OFF)
 option(BUILD_VINEYARD_FUSE "Enable vineyard's fuse support" OFF)
@@ -135,8 +135,8 @@ if(USE_INCLUDE_WHAT_YOU_USE AND NOT CMAKE_CXX_INCLUDE_WHAT_YOU_USE)
     endif()
 endif()
 
-set(DEFAUTL_ALLOCATOR "dlmalloc")
-set(WITH_ALLOCATOR "${DEFAUTL_ALLOCATOR}" CACHE
+set(DEFAULT_ALLOCATOR "dlmalloc")
+set(WITH_ALLOCATOR "${DEFAULT_ALLOCATOR}" CACHE
     STRING "Choose the allocator for vineyard server (vineyardd)."
 )
 set_property(CACHE WITH_ALLOCATOR PROPERTY STRINGS
@@ -162,10 +162,12 @@ function(message)
     endif()
 endfunction()
 
+message(STATUS "Vineyard will be installed to: ${CMAKE_INSTALL_PREFIX}")
+
 # reference: https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#always-full-rpath
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 if(APPLE)
-    # the LC_RPATH on Mac seems doesn't support multiple path (seperated with ':seperated with `:`)
+    # the LC_RPATH on Mac seems doesn't support multiple path (separated with `:`)
     # fortunately, we just need to take care `lib` on Mac.
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 else()
@@ -219,7 +221,7 @@ endif()
 if(APPLE)
     set(CMAKE_MACOSX_RPATH ON)
 else()
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN:$ORIGIN/../lib")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN:$ORIGIN/../shared-lib")
 endif()
 
 if(CMAKE_VERSION VERSION_LESS "3.1")
@@ -425,26 +427,23 @@ endmacro()
 
 macro(find_nlohmann_json)
     # include nlohmann/json
-    set(JSON_BuildTests OFF CACHE INTERNAL "")
+    add_definitions(-DJSON_USE_GLOBAL_UDLS=1)
+    add_definitions(-DJSON_USE_IMPLICIT_CONVERSIONS=0)
+    add_definitions(-DJSON_DISABLE_ENUM_SERIALIZATION=0)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND USE_JSON_DIAGNOSTICS)
-        set(JSON_Diagnostics ON CACHE INTERNAL "")
+        add_definitions(-DJSON_DIAGNOSTICS=1)
     else()
-        set(JSON_Diagnostics OFF CACHE INTERNAL "")
+        add_definitions(-DJSON_DIAGNOSTICS=0)
     endif()
-    set(JSON_Install ON CACHE INTERNAL "")
-    set(JSON_MultipleHeaders ON CACHE INTERNAL "")
-    set(JSON_ImplicitConversions OFF CACHE INTERNAL "")
-    if(NOT TARGET nlohmann_json AND NOT TARGET nlohmann_json::nlohmann_json)
-        if(USE_EXTERNAL_NLOHMANN_JSON_LIBS)
-            find_package(nlohmann_json 3.10.5 QUIET)
-            if(NOT TARGET nlohmann_json AND NOT TARGET nlohmann_json::nlohmann_json)
-                message(WARNING "nlohmann-json not found, will use the bundled one from git submodules.")
-                add_subdirectory_static(thirdparty/nlohmann-json)
-            endif()
-        else()
-            add_subdirectory_static(thirdparty/nlohmann-json)
-        endif()
-    endif()
+    add_definitions(-DJSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON=0)
+    install(DIRECTORY "${PROJECT_SOURCE_DIR}/thirdparty/nlohmann-json/single_include"
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/include/vineyard/contrib
+            PATTERN "*.hpp"
+    )
+    include_directories(BEFORE SYSTEM
+                        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/thirdparty/nlohmann-json>
+                        $<INSTALL_INTERFACE:include/vineyard/contrib>
+    )
 endmacro()
 
 macro(find_openssl_libraries)
@@ -552,7 +551,7 @@ endmacro()
 
 macro(target_enable_sanitizer target visibility)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND VINEYARD_USE_ASAN)
-        message(STATUS "Vineyardd will be bulit with -fsanitize=address")
+        message(STATUS "Vineyardd will be built with -fsanitize=address")
         target_compile_options(${target} ${visibility} -fsanitize=address)
         target_add_link_options(${target} ${visibility} OPTIONS -fsanitize=address)
     endif()
@@ -649,7 +648,6 @@ if(BUILD_VINEYARD_SERVER)
                                        "src/common/memory/*.cc"
                                        "src/common/util/*.cc"
                                        "src/common/memory/gpu/*.cc"
-                                       
     )
     if(BUILD_VINEYARD_SERVER_REDIS)
         list(APPEND SERVER_SRC_FILES "thirdparty/redis-plus-plus-shim/recipes/redlock.cpp")
@@ -665,7 +663,6 @@ if(BUILD_VINEYARD_SERVER)
                                             ${OPENSSL_LIBRARIES}
                                             libzstd_static
                                             mimalloc-static
-                                            nlohmann_json::nlohmann_json
     )
     if(ARROW_SHARED_LIB)
         target_link_libraries(vineyardd PRIVATE ${ARROW_SHARED_LIB})
@@ -677,7 +674,7 @@ if(BUILD_VINEYARD_SERVER)
         enable_language(CUDA)
         find_package(CUDA REQUIRED)
         add_definitions(-DENABLE_GPU)
-        include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}) 
+        include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
         target_link_libraries(vineyardd PUBLIC ${CUDA_LIBRARIES})
     endif()
 
@@ -698,7 +695,6 @@ if(BUILD_VINEYARD_SERVER)
 
     install_vineyard_target(vineyardd)
     install_vineyard_headers("${PROJECT_SOURCE_DIR}/src/server")
-    target_enable_sanitizer(vineyardd PRIVATE)
     if(NOT BUILD_SHARED_LIBS)
         if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
             target_compile_options(vineyardd PRIVATE -static-libgcc -static-libstdc++ -Os)
@@ -720,24 +716,6 @@ if(BUILD_VINEYARD_SERVER)
     endif()
     if(WITH_ALLOCATOR STREQUAL "mimalloc")
         target_compile_options(vineyardd PRIVATE -DDEFAULT_ALLOCATOR=mimalloc)
-    endif()
-
-    file(GLOB_RECURSE VINEYARD_CLIENT_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src"
-                                              "client/*.h")
-    if(BUILD_VINEYARD_JAVA AND VINEYARD_CLIENT_HEADERS)
-        vineyard_generate_java(
-            OUT_VAR VINEYARD_JAVA_GENERATES
-            VINEYARD_MODULES ${VINEYARD_CLIENT_HEADERS}
-        )
-    else()
-        set(VINEYARD_JAVA_GENERATES)
-    endif()
-    add_custom_target(vineyard_client_gen_java
-        DEPENDS ${VINEYARD_JAVA_GENERATES}
-        COMMENT "Running java code generation for vineyard_client."
-    )
-    if(VINEYARD_JAVA_GENERATES)
-        add_dependencies(vineyard_codegen_java vineyard_client_gen_java)
     endif()
 endif()
 
@@ -775,7 +753,6 @@ if(BUILD_VINEYARD_CLIENT)
     target_add_debuginfo(vineyard_client)
     target_link_libraries(vineyard_client PUBLIC ${CMAKE_DL_LIBS}
                                                  Threads::Threads
-                                                 nlohmann_json::nlohmann_json
     )
     if(USE_GPU)
         find_package(CUDA REQUIRED)
@@ -809,6 +786,25 @@ if(BUILD_VINEYARD_CLIENT)
             target_compile_options(vineyard_client PRIVATE -fvisibility=hidden)
         endif()
     endif()
+
+    file(GLOB_RECURSE VINEYARD_CLIENT_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src"
+                                              "client/*.h")
+    if(BUILD_VINEYARD_JAVA AND VINEYARD_CLIENT_HEADERS)
+        vineyard_generate_java(
+            OUT_VAR VINEYARD_JAVA_GENERATES
+            VINEYARD_MODULES ${VINEYARD_CLIENT_HEADERS}
+        )
+    else()
+        set(VINEYARD_JAVA_GENERATES)
+    endif()
+    add_custom_target(vineyard_client_gen_java
+        DEPENDS ${VINEYARD_JAVA_GENERATES}
+        COMMENT "Running java code generation for vineyard_client."
+    )
+    if(VINEYARD_JAVA_GENERATES)
+        add_dependencies(vineyard_codegen_java vineyard_client_gen_java)
+    endif()
+
     install_vineyard_target(vineyard_client)
     install_vineyard_headers("${PROJECT_SOURCE_DIR}/src/client")
     list(APPEND VINEYARD_INSTALL_LIBS vineyard_client)
@@ -831,13 +827,9 @@ if(BUILD_VINEYARD_PYTHON_BINDINGS)
     pybind11_add_module(_C MODULE ${PYTHON_BIND_FILES})
     target_add_debuginfo(_C)
     target_link_libraries(_C PRIVATE vineyard_client)
-    target_include_directories(_C PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-                                         thirdparty/pybind11/include)
+    target_include_directories(_C PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/pybind11/include")
     target_compile_options(_C PRIVATE -Wno-unused-value)
     set_target_properties(_C PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/shared-lib")
-    target_add_link_options(_C PRIVATE
-                            OPTIONS -Wl,-rpath,.:$ORIGIN:${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64
-    )
     if(UNIX AND NOT APPLE)
         target_add_link_options(_C PRIVATE OPTIONS -Wl,--exclude-libs=ALL)
     endif()
@@ -847,6 +839,20 @@ if(BUILD_VINEYARD_PYTHON_BINDINGS)
     else()
         target_compile_options(_C PRIVATE -Os)
         target_add_link_options(_C PRIVATE OPTIONS -Os)
+    endif()
+
+    file(RELATIVE_PATH RELATIVE_BUILD_PATH "${PROJECT_SOURCE_DIR}/python/vineyard" "${CMAKE_BINARY_DIR}/shared-lib")
+    if(UNIX AND NOT APPLE)
+        set_target_properties(_C PROPERTIES
+                              BUILD_WITH_INSTALL_RPATH TRUE
+                              INSTALL_RPATH_USE_LINK_PATH TRUE
+                              INSTALL_RPATH ".:\$ORIGIN:\$ORIGIN/${RELATIVE_BUILD_PATH}/:${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64:${INSTALL_RPATH}")
+    endif()
+    if(APPLE)
+        set_target_properties(_C PROPERTIES
+                              BUILD_WITH_INSTALL_RPATH TRUE
+                              INSTALL_RPATH_USE_LINK_PATH TRUE
+                              INSTALL_RPATH ".;@loader_path;@loader_path/${RELATIVE_BUILD_PATH}/;${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib64;${INSTALL_RPATH}")
     endif()
 
     add_custom_target(vineyard_client_python
@@ -889,7 +895,6 @@ if(BUILD_VINEYARD_HOSSEINMOEIN_DATAFRAME)
     add_subdirectory(modules/hosseinmoein-dataframe)
     list(APPEND VINEYARD_INSTALL_LIBS vineyard_hosseinmoein_dataframe)
 endif()
-
 
 if(BUILD_VINEYARD_TESTS)
     add_subdirectory(test)

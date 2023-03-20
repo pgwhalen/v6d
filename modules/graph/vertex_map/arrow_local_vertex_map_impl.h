@@ -282,7 +282,10 @@ ArrowLocalVertexMapBuilder<OID_T, VID_T>::ArrowLocalVertexMapBuilder(
       i2o_index_[fid].resize(label_num_);
     }
   }
-  vertices_num_.resize(label_num_);
+  vertices_num_.resize(fnum_);
+  for (fid_t fid = 0; fid < fnum_; ++fid) {
+    vertices_num_[fid].resize(label_num_);
+  }
 
   id_parser_.Init(fnum_, label_num_);
 }
@@ -295,12 +298,17 @@ vineyard::Status ArrowLocalVertexMapBuilder<OID_T, VID_T>::Build(
 }
 
 template <typename OID_T, typename VID_T>
-std::shared_ptr<vineyard::Object>
-ArrowLocalVertexMapBuilder<OID_T, VID_T>::_Seal(vineyard::Client& client) {
+Status ArrowLocalVertexMapBuilder<OID_T, VID_T>::_Seal(
+    vineyard::Client& client, std::shared_ptr<vineyard::Object>& object) {
   // ensure the builder hasn't been sealed yet.
   ENSURE_NOT_SEALED(this);
 
+  // empty method
+  // VINEYARD_CHECK_OK(this->Build(client));
+
   auto vertex_map = std::make_shared<ArrowLocalVertexMap<oid_t, vid_t>>();
+  object = vertex_map;
+
   vertex_map->fnum_ = fnum_;
   vertex_map->label_num_ = label_num_;
   vertex_map->id_parser_.Init(fnum_, label_num_);
@@ -317,6 +325,7 @@ ArrowLocalVertexMapBuilder<OID_T, VID_T>::_Seal(vineyard::Client& client) {
   vertex_map->o2i_ = o2i_;
   vertex_map->i2o_ = i2o_;
   vertex_map->i2o_index_ = i2o_index_;
+  vertex_map->vertices_num_ = vertices_num_;
 
   vertex_map->meta_.SetTypeName(type_name<ArrowLocalVertexMap<oid_t, vid_t>>());
 
@@ -343,17 +352,16 @@ ArrowLocalVertexMapBuilder<OID_T, VID_T>::_Seal(vineyard::Client& client) {
         nbytes += i2o_index_[fid][label].nbytes();
       }
       vertex_map->meta_.AddKeyValue("vertices_num_" + suffix,
-                                    vertices_num_[label][fid]);
+                                    vertices_num_[fid][label]);
     }
   }
 
   vertex_map->meta_.SetNBytes(nbytes);
 
-  VINEYARD_CHECK_OK(client.CreateMetaData(vertex_map->meta_, vertex_map->id_));
+  RETURN_ON_ERROR(client.CreateMetaData(vertex_map->meta_, vertex_map->id_));
   // mark the builder as sealed
   this->set_sealed(true);
-
-  return std::static_pointer_cast<vineyard::Object>(vertex_map);
+  return Status::OK();
 }
 
 template <typename OID_T, typename VID_T>
@@ -386,14 +394,14 @@ template <typename OID_T, typename VID_T>
 vineyard::Status ArrowLocalVertexMapBuilder<OID_T, VID_T>::addLocalVertices(
     grape::CommSpec& comm_spec,
     std::vector<std::vector<std::shared_ptr<oid_array_t>>> oid_arrays) {
-  vertices_num_.resize(label_num_);
   auto fn = [&](label_id_t label) -> Status {
     auto& arrays = oid_arrays[label];
     typename InternalType<oid_t>::vineyard_builder_type array_builder(client,
                                                                       arrays);
+    std::shared_ptr<Object> object;
+    RETURN_ON_ERROR(array_builder.Seal(client, object));
     oid_arrays_[fid_][label] = *std::dynamic_pointer_cast<
-        typename InternalType<oid_t>::vineyard_array_type>(
-        array_builder.Seal(client));
+        typename InternalType<oid_t>::vineyard_array_type>(object);
 
     // release the reference
     arrays.clear();
@@ -406,12 +414,11 @@ vineyard::Status ArrowLocalVertexMapBuilder<OID_T, VID_T>::addLocalVertices(
     for (int64_t i = 0; i < vnum; ++i) {
       builder.emplace(array->GetView(i), i);
     }
+    RETURN_ON_ERROR(builder.Seal(client, object));
     o2i_[fid_][label] =
-        *std::dynamic_pointer_cast<vineyard::Hashmap<oid_t, vid_t>>(
-            builder.Seal(client));
+        *std::dynamic_pointer_cast<vineyard::Hashmap<oid_t, vid_t>>(object);
 
-    vertices_num_[label].resize(fnum_);
-    vertices_num_[label][fid_] = vnum;
+    vertices_num_[fid_][label] = vnum;
     return Status::OK();
   };
 
@@ -428,7 +435,12 @@ vineyard::Status ArrowLocalVertexMapBuilder<OID_T, VID_T>::addLocalVertices(
 
   // sync the vertices_num
   for (label_id_t label = 0; label < label_num_; ++label) {
-    grape::sync_comm::AllGather(vertices_num_[label], comm_spec.comm());
+    std::vector<vid_t> current_vertices_num(fnum_);
+    current_vertices_num[fid_] = vertices_num_[fid_][label];
+    grape::sync_comm::AllGather(current_vertices_num, comm_spec.comm());
+    for (fid_t fid = 0; fid < fnum_; ++fid) {
+      vertices_num_[fid][label] = current_vertices_num[fid];
+    }
   }
   return vineyard::Status::OK();
 }
@@ -470,9 +482,10 @@ ArrowLocalVertexMapBuilder<OID_T, VID_T>::AddOuterVerticesMapping(
     RETURN_ON_ARROW_ERROR(array_builder.Finish(&oid_array));
     typename InternalType<oid_t>::vineyard_builder_type outer_oid_builder(
         client, oid_array);
+    std::shared_ptr<Object> object;
+    RETURN_ON_ERROR(outer_oid_builder.Seal(client, object));
     oid_arrays_[cur_fid][cur_label] = *std::dynamic_pointer_cast<
-        typename InternalType<oid_t>::vineyard_array_type>(
-        outer_oid_builder.Seal(client));
+        typename InternalType<oid_t>::vineyard_array_type>(object);
 
     std::shared_ptr<oid_array_t>& current_oid_array = oids[cur_fid][cur_label];
 
@@ -493,15 +506,15 @@ ArrowLocalVertexMapBuilder<OID_T, VID_T>::AddOuterVerticesMapping(
     index_list[cur_fid][cur_label].clear();
     index_list[cur_fid][cur_label].shrink_to_fit();
 
+    RETURN_ON_ERROR(o2i_builder.Seal(client, object));
     o2i_[cur_fid][cur_label] =
-        *std::dynamic_pointer_cast<vineyard::Hashmap<oid_t, vid_t>>(
-            o2i_builder.Seal(client));
+        *std::dynamic_pointer_cast<vineyard::Hashmap<oid_t, vid_t>>(object);
+    RETURN_ON_ERROR(i2o_builder.Seal(client, object));
     i2o_[cur_fid][cur_label] =
-        *std::dynamic_pointer_cast<vineyard::Hashmap<vid_t, oid_t>>(
-            i2o_builder.Seal(client));
+        *std::dynamic_pointer_cast<vineyard::Hashmap<vid_t, oid_t>>(object);
+    RETURN_ON_ERROR(i2o_index_builder.Seal(client, object));
     i2o_index_[cur_fid][cur_label] =
-        *std::dynamic_pointer_cast<vineyard::Hashmap<vid_t, vid_t>>(
-            i2o_index_builder.Seal(client));
+        *std::dynamic_pointer_cast<vineyard::Hashmap<vid_t, vid_t>>(object);
     return Status::OK();
   };
 
@@ -531,9 +544,10 @@ ArrowLocalVertexMapBuilder<OID_T, VID_T>::AddOuterVerticesMapping(
   auto fn = [&](fid_t cur_fid, label_id_t cur_label) -> Status {
     typename InternalType<oid_t>::vineyard_builder_type outer_oid_builder(
         client, oids[cur_fid][cur_label]);
+    std::shared_ptr<Object> object;
+    RETURN_ON_ERROR(outer_oid_builder.Seal(client, object));
     oid_arrays_[cur_fid][cur_label] = *std::dynamic_pointer_cast<
-        typename InternalType<oid_t>::vineyard_array_type>(
-        outer_oid_builder.Seal(client));
+        typename InternalType<oid_t>::vineyard_array_type>(object);
 
     // release the reference
     oids[cur_fid][cur_label].reset();
@@ -560,15 +574,15 @@ ArrowLocalVertexMapBuilder<OID_T, VID_T>::AddOuterVerticesMapping(
     index_list[cur_fid][cur_label].clear();
     index_list[cur_fid][cur_label].shrink_to_fit();
 
+    RETURN_ON_ERROR(o2i_builder.Seal(client, object));
     o2i_[cur_fid][cur_label] =
-        *std::dynamic_pointer_cast<vineyard::Hashmap<oid_t, vid_t>>(
-            o2i_builder.Seal(client));
+        *std::dynamic_pointer_cast<vineyard::Hashmap<oid_t, vid_t>>(object);
+    RETURN_ON_ERROR(i2o_builder.Seal(client, object));
     i2o_[cur_fid][cur_label] =
-        *std::dynamic_pointer_cast<vineyard::Hashmap<vid_t, oid_t>>(
-            i2o_builder.Seal(client));
+        *std::dynamic_pointer_cast<vineyard::Hashmap<vid_t, oid_t>>(object);
+    RETURN_ON_ERROR(i2o_index_builder.Seal(client, object));
     i2o_index_[cur_fid][cur_label] =
-        *std::dynamic_pointer_cast<vineyard::Hashmap<vid_t, vid_t>>(
-            i2o_index_builder.Seal(client));
+        *std::dynamic_pointer_cast<vineyard::Hashmap<vid_t, vid_t>>(object);
     return Status::OK();
   };
 

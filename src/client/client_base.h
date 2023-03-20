@@ -241,7 +241,7 @@ class ClientBase {
 
   /**
    * @brief Push a chunk from a stream. When there's no more chunk available in
-   * the stream, i.e., the stream has been stoped, a status code
+   * the stream, i.e., the stream has been stopped, a status code
    * `kStreamDrained` or `kStreamFinish` will be returned, otherwise the reader
    * will be blocked until writer creates a new chunk in the stream.
    *
@@ -254,7 +254,7 @@ class ClientBase {
 
   /**
    * @brief Pull a chunk from a stream. When there's no more chunk available in
-   * the stream, i.e., the stream has been stoped, a status code
+   * the stream, i.e., the stream has been stopped, a status code
    * `kStreamDrained` or `kStreamFinish` will be returned, otherwise the reader
    * will be blocked until writer creates a new chunk in the stream.
    *
@@ -267,7 +267,7 @@ class ClientBase {
 
   /**
    * @brief Pull a chunk from a stream. When there's no more chunk available in
-   * the stream, i.e., the stream has been stoped, a status code
+   * the stream, i.e., the stream has been stopped, a status code
    * `kStreamDrained` or `kStreamFinish` will be returned, otherwise the reader
    * will be blocked until writer creates a new chunk in the stream.
    *
@@ -280,7 +280,7 @@ class ClientBase {
 
   /**
    * @brief Pull a chunk from a stream. When there's no more chunk available in
-   * the stream, i.e., the stream has been stoped, a status code
+   * the stream, i.e., the stream has been stopped, a status code
    * `kStreamDrained` or `kStreamFinish` will be returned, otherwise the reader
    * will be blocked until writer creates a new chunk in the stream.
    *
@@ -295,7 +295,7 @@ class ClientBase {
    * @brief Stop a stream, mark it as finished or aborted.
    *
    * @param id The id of the stream.
-   * @param failed Whether the stream is stoped at a successful state. True
+   * @param failed Whether the stream is stopped at a successful state. True
    * means the stream has been exited normally, otherwise false.
    *
    * @return Status that indicates whether the request has succeeded.
@@ -359,7 +359,7 @@ class ClientBase {
 
   /**
    * @brief Make a shallow copy on the given object. A "shallow copy" means the
-   * result object has the same type with the source object and they shares all
+   * result object has the same type with the source object and they share all
    * member objects.
    *
    * @param id The object id to shallow copy.
@@ -386,7 +386,7 @@ class ClientBase {
   Status PutName(const ObjectID id, std::string const& name);
 
   /**
-   * @brief Retrieve the object ID by assoicated name.
+   * @brief Retrieve the object ID by associated name.
    *
    * @param name The name of the requested object.
    * @param id The returned object ID.
@@ -399,7 +399,7 @@ class ClientBase {
                  const bool wait = false);
 
   /**
-   * @brief Deregister a name entry. The assoicated object will be kept and
+   * @brief Deregister a name entry. The associated object will be kept and
    * won't be deleted.
    *
    * @param name The name that will be deregistered.
@@ -424,6 +424,45 @@ class ClientBase {
             the cluster.
    */
   Status Clear();
+
+  /**
+   * @brief Associate given labels to an existing object.
+   *
+   * @param object Object to be labeled.
+   */
+  Status Label(const ObjectID object, std::string const& key,
+               std::string const& value);
+
+  /**
+   * @brief Associate given labels to an existing object.
+   *
+   * @param object Object to be labeled.
+   */
+  Status Label(const ObjectID object,
+               std::map<std::string, std::string> const& labels);
+
+  /**
+   * @brief Evict objects from the vineyardd server.
+   *
+   * @param objects Objects to be evicted.
+   */
+  Status Evict(std::vector<ObjectID> const& objects);
+
+  /**
+   * @brief Load objects to ensure they resident in vineyardd server's memory,
+   *        with an optional arguments to pin these objects to prevent from
+   *        being spilled.
+   *
+   * @param objects Objects to be reloaded, and possibly pinned.
+   */
+  Status Load(std::vector<ObjectID> const& objects, const bool pin = false);
+
+  /**
+   * @brief Unpin objects from the vineyardd server's memory
+   *
+   * @param objects Objects to be unpinned.
+   */
+  Status Unpin(std::vector<ObjectID> const& objects);
 
   /**
    * @brief Check if the client still connects to the vineyard server.
@@ -507,7 +546,7 @@ class ClientBase {
   /**
    * @brief Return the status of connected vineyard instance.
    *
-   * If success, the `status` parameter will be reseted as an instance of
+   * If success, the `status` parameter will be reset as an instance of
    * InstanceStatus.
    *
    * @param status The result instance status.

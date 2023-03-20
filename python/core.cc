@@ -164,7 +164,7 @@ void bind_core(py::module& mod) {
           "set_global",
           [](ObjectMeta* self, const bool global) { self->SetGlobal(global); },
           py::arg("global") = true)
-      .def("__contains__", &ObjectMeta::Haskey, "key"_a)
+      .def("__contains__", &ObjectMeta::HasKey, "key"_a)
       .def(
           "__getitem__",
           [](ObjectMeta* self, std::string const& key) -> py::object {
@@ -296,6 +296,17 @@ void bind_core(py::module& mod) {
             return detail::from_json(usages);
           },
           py::arg("pretty") = true)
+      .def_property_readonly("timestamp", &ObjectMeta::Timestamp)
+      .def_property_readonly("labels",
+                             [](const ObjectMeta* self) -> py::object {
+                               return detail::from_json(self->Labels());
+                             })
+      .def(
+          "label",
+          [](const ObjectMeta* self, std::string const& key) -> std::string {
+            return self->Label(key);
+          },
+          "key"_a)
       .def("reset_key",
            [](ObjectMeta& meta, std::string const& key) { meta.ResetKey(key); })
       .def("reset_signature", [](ObjectMeta& meta) { meta.ResetSignature(); })
@@ -399,7 +410,14 @@ void bind_core(py::module& mod) {
   py::class_<ObjectBuilder, std::shared_ptr<ObjectBuilder>>(mod,
                                                             "ObjectBuilder")
       // NB: don't expose the "Build" method to python.
-      .def("seal", &ObjectBuilder::Seal, "client"_a)
+      .def(
+          "seal",
+          [](ObjectBuilder* self, Client* client) {
+            std::shared_ptr<Object> object;
+            throw_on_error(self->Seal(*client, object));
+            return object;
+          },
+          "client"_a)
       .def_property_readonly("issealed", &ObjectBuilder::sealed);
 }
 

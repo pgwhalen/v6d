@@ -44,7 +44,7 @@ class Object;
 
 /**
  * @brief ObjectMeta is the type for metadata of an Object. The ObjectMeta can
- * be treat as a *dict-like* type. If the the metadata if the metadata obtained
+ * be treated as a *dict-like* type. If the metadata obtained
  * from vineyard, the metadata is readonly. Otherwise *key-value* attributes or
  * object members could be associated with the metadata to construct a new
  * vineyard object.
@@ -142,7 +142,13 @@ class ObjectMeta {
   /**
    * @brief Whether specific `key` exists in this metadata.
    */
-  bool const Haskey(std::string const& key) const;
+  bool const Haskey(std::string const& key) const __attribute__((deprecated(
+      "The method `Haskey()` is deprecated, use `HasKey()` instead.")));
+
+  /**
+   * @brief Whether specific `key` exists in this metadata.
+   */
+  bool const HasKey(std::string const& key) const;
 
   /**
    * @brief Reset the given key in the metadata.
@@ -722,6 +728,16 @@ class ObjectMeta {
    * @brief Compute the memory usage of this object, in a json tree format.
    */
   size_t MemoryUsage(json& usages, const bool pretty = true) const;
+
+  /**
+   * @brief Get the associate timestamp (in milliseconds) inside the metadata, 0
+   *        means unknown.
+   */
+  uint64_t Timestamp() const;
+
+  json Labels() const;
+
+  const std::string Label(const std::string& key) const;
 
   std::string ToString() const;
 

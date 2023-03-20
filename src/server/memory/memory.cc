@@ -230,22 +230,23 @@ template <typename ID, typename P>
 Status BulkStoreBase<ID, P>::GetUnsafe(
     std::vector<ID> const& ids, const bool unsafe,
     std::vector<std::shared_ptr<P>>& objects) {
-  for (auto object_id : ids) {
-    if (object_id == EmptyBlobID<ID>()) {
+  for (auto id : ids) {
+    if (id == EmptyBlobID<ID>()) {
       objects.push_back(P::MakeEmpty());
     } else {
       Status status;
-      bool accessed =
-          objects_.find_fn(object_id,
-                           [unsafe, &objects,
-                            &status](const std::shared_ptr<P>& object) -> void {
-                             if (unsafe || object->IsSealed()) {
-                               objects.push_back(object);
-                             } else {
-                               objects.clear();
-                               status = Status::ObjectNotSealed();
-                             }
-                           });
+      bool accessed = objects_.find_fn(
+          id,
+          [id, unsafe, &objects,
+           &status](const std::shared_ptr<P>& object) -> void {
+            if (unsafe || object->IsSealed()) {
+              objects.push_back(object);
+            } else {
+              objects.clear();
+              status = Status::ObjectNotSealed("Failed to get blob with id " +
+                                               IDToString<ID>(id));
+            }
+          });
       if (accessed && !status.ok()) {
         return status;
       }
@@ -496,16 +497,16 @@ Status BulkStoreBase<ID, P>::MoveOwnership(
 
 template <typename ID, typename P>
 Status BulkStoreBase<ID, P>::RemoveOwnership(
-    std::set<ID> const& ids, std::map<ID, P>& successed_id_to_size) {
+    std::set<ID> const& ids, std::map<ID, P>& succeeded_id_to_size) {
   for (auto id : ids) {
     if (id == EmptyBlobID<ID>() ||
         id == GenerateBlobID<ID>(std::numeric_limits<uintptr_t>::max())) {
       continue;
     }
     objects_.update_fn(
-        id, [id, &successed_id_to_size](std::shared_ptr<P>& object) -> void {
+        id, [id, &succeeded_id_to_size](std::shared_ptr<P>& object) -> void {
           object->RemoveOwner();
-          successed_id_to_size.emplace(id, *object);
+          succeeded_id_to_size.emplace(id, *object);
         });
   }
   return Status::OK();

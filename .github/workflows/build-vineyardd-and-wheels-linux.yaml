@@ -109,8 +109,42 @@ jobs:
           name: vineyardd.${{ runner.os }}-generic.${{ github.sha }}.tar.gz
           path: vineyardd.${{ runner.os }}-generic.${{ github.sha }}.tar.gz
 
+  build-vineyardctl:
+    runs-on: ${{ matrix.os }}
+    if: ${{ github.repository == 'v6d-io/v6d' }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: false
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Build vineyardctl
+        run: |
+          go build -a -o vineyardctl k8s/cmd/main.go
+          strip ./vineyardctl || true
+
+      - name: Package vineyardctl artifact on Linux
+        run: |
+          sha512sum vineyardctl > vineyardctl.${{ github.sha }}.sha512sum
+          echo "Checksum is: "
+          cat ./*.sha512sum
+          tar zcvfh vineyardctl.${{ runner.os }}-generic.${{ github.sha }}.tar.gz ./vineyardctl vineyardctl.${{ github.sha }}.sha512sum
+
+      - name: Upload CI artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: vineyardctl.${{ runner.os }}-generic.${{ github.sha }}.tar.gz
+          path: vineyardctl.${{ runner.os }}-generic.${{ github.sha }}.tar.gz
+
   build-wheels:
-    needs: [build-vineyardd]
+    needs: [build-vineyardd, build-vineyardctl]
     runs-on: ${{ matrix.os }}
     if: ${{ github.repository == 'v6d-io/v6d' }}
     strategy:
@@ -141,10 +175,18 @@ jobs:
         with:
           name: vineyardd.${{ runner.os }}-generic.${{ github.sha }}.tar.gz
 
-      - name: Prepare vineyardd binary
+      - name: Download vineyardctl artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: vineyardctl.${{ runner.os }}-generic.${{ github.sha }}.tar.gz
+
+      - name: Prepare binary
         run: |
           tar zxvf vineyardd.${{ runner.os }}-generic.${{ github.sha }}.tar.gz
-          mv vineyardd python/vineyard/vineyardd
+          tar zxvf vineyardctl.${{ runner.os }}-generic.${{ github.sha }}.tar.gz
+
+          mv vineyardd python/vineyard/bdist/vineyardd
+          mv vineyardctl python/vineyard/bdist/vineyardctl
 
       - name: Login docker registry
         run: |
@@ -165,6 +207,12 @@ jobs:
                               --build-arg python=${{ matrix.python }}
           sudo docker run --rm -v `pwd`:/target ghcr.io/v6d-io/v6d/vineyard-wheel:${{ matrix.python }}.${{ github.sha }} sh -c "cp -r /work/fixed_wheels/ /target/"
           ls -la ./fixed_wheels/
+
+          if [[ "${{ matrix.python }}" == "cp311-cp311" ]];
+          then
+            python3 setup_bdist.py bdist_wheel
+            sudo cp dist/*.whl fixed_wheels/ || true
+          fi
 
       - name: Extract tag name
         id: tag

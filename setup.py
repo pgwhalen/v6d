@@ -20,6 +20,7 @@ import os
 import subprocess
 import sys
 import textwrap
+from configparser import ConfigParser
 from distutils.cmd import Command
 from distutils.util import strtobool
 from typing import List
@@ -33,6 +34,15 @@ from setuptools.dist import Distribution
 from wheel.bdist_wheel import bdist_wheel
 
 repo_root = os.path.dirname(os.path.abspath(__file__))
+
+try:
+    cf = ConfigParser()
+    cf.read(os.path.join(repo_root, 'setup.cfg'))
+    __version__ = cf['metadata']['version']
+    vineyard_bdist = 'vineyard-bdist==%s' % __version__
+except:  # noqa: E722
+    __version__ = None
+    vineyard_bdist = 'vineyard-bdist'
 
 
 def value_to_bool(val):
@@ -179,8 +189,17 @@ def load_requirements_txt(kind=""):
     return requirements
 
 
+def package_data():
+    artifacts = [
+        '**/*.yaml',
+        '**/*.yaml.tpl',
+        '**/**/*.sh',
+    ]
+    return artifacts
+
+
 with open(
-    os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.rst'),
+    os.path.join(repo_root, 'README.rst'),
     encoding='utf-8',
     mode='r',
 ) as fp:
@@ -212,12 +231,7 @@ setup(
     package_dir={'': 'python'},
     packages=find_core_packages('python'),
     package_data={
-        'vineyard': [
-            'vineyardd',
-            '**/*.yaml',
-            '**/*.yaml.tpl',
-            '**/**/*.sh',
-        ],
+        'vineyard': package_data(),
     },
     ext_modules=[
         CopyCMakeExtension('vineyard._C'),
@@ -231,16 +245,17 @@ setup(
     distclass=BinDistribution,
     zip_safe=False,
     entry_points={
-        'cli': ['vineyard-codegen=vineyard.cli:main'],
+        'vineyardcli': ['vineyard-codegen=vineyard.cli:main'],
+        'vineyardctl': ['vineyard-codegen=vineyard.deploy.ctl:_main'],
         'console_scripts': ['vineyard-codegen=vineyard.core.codegen:main'],
     },
     setup_requires=load_requirements_txt("-setup"),
-    install_requires=load_requirements_txt(),
+    install_requires=load_requirements_txt() + [vineyard_bdist],
     extras_require={
         'dev': load_requirements_txt("-dev"),
         'kubernetes': load_requirements_txt("-kubernetes"),
     },
-    platform=["POSIX", "MacOS"],
+    platforms=["POSIX", "MacOS"],
     license="Apache License 2.0",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -257,6 +272,8 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
     project_urls={
         "Documentation": "https://v6d.io",

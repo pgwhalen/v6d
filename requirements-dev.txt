@@ -6,11 +6,14 @@ furo        # sphinx theme
 isort>=5.10.1
 jinja2>=3.0.0
 libclang
+linkify-it-py
+myst-parser>=0.13.0
 nbsphinx
 pygments>=2.4.1
 pytest
 pytest-benchmark
 pytest-datafiles
+pytest-timeout
 sphinx>=3.0.2,<6
 sphinx-copybutton
 sphinx-panels

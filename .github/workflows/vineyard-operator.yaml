@@ -28,6 +28,7 @@ on:
   pull_request:
     branches:
       - main
+      - dev/kubernetes
     paths:
       - '.github/workflows/vineyard-operator.yaml'
       - 'k8s/**'
@@ -64,6 +65,7 @@ jobs:
           - e2e-tests-spill
           - e2e-tests-workflow
           - e2e-tests-mars-examples
+          - e2e-tests-vineyardctl
     steps:
       - uses: actions/checkout@v3
         with:
@@ -71,7 +73,7 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version: '^1.18.0'
+          go-version: 1.19
 
       - name: Cache for golang
         uses: actions/cache@v3
@@ -81,7 +83,14 @@ jobs:
           restore-keys: |
             vineyard-kubernetes-go-
 
-      - name: Golang format and lint
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.49.0
+          working-directory: k8s
+          skip-pkg-cache: true
+
+      - name: Golang format
         run: |
           function prepend() { while read line; do echo "${1}${line}"; done; }
 
@@ -102,29 +111,13 @@ jobs:
               exit -1
           fi
 
-          function ec() { [[ "$1" == "-h" ]] && { shift && eval $* > /dev/null 2>&1; ec=$?; echo $ec; } || eval $*; ec=$?; }
-
-          ec make -C k8s golint
-          if [[ "$ec" != "0" ]]; then
-              echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-              echo "| golangci-lint (golang format) failures found!"
-              echo "|"
-              echo "| Run: "
-              echo "|"
-              echo "|    ${GOPATH}/bin/golangci-lint run ./... --fix"
-              echo "|"
-              echo "| to fix this error."
-              echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-              exit -1
-          fi
-
       - name: Log in to GitHub Docker Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Build docker image
         run: |
           make -C k8s docker-build
@@ -202,6 +195,12 @@ jobs:
           make -C k8s/test/e2e e2e-tests-workflow
 
       - name: e2e-tests-mars-examples
-        if: ${{ matrix.job == 'e2e-tests-mars-examples' }}
+        if: false  # temporarily disabled, we need some changes in mars
+        # if: ${{ matrix.job == 'e2e-tests-mars-examples' }}
         run: |
           make -C k8s/test/e2e e2e-tests-mars-examples
+
+      - name: e2e-tests-vineyardctl
+        if: ${{ matrix.job == 'e2e-tests-vineyardctl' }}
+        run: |
+          make -C k8s/test/e2e e2e-tests-vineyardctl

@@ -133,6 +133,28 @@ PropertyType PropertyTypeFromString(const std::string& type) {
     return arrow::large_list(arrow::float64());
   } else if (type_upper == "LARGELISTSTRING") {
     return arrow::large_list(arrow::large_utf8());
+  } else if (type_upper.substr(0, std::string("FIXEDLIST").length()) ==
+             std::string("FIXEDLIST")) {
+    auto type_prefix_length = std::string("FIXEDLIST").size();
+    if (type_upper.find("INT") == type_prefix_length) {
+      int32_t list_size = std::stoi(type_upper.substr(type_prefix_length + 3));
+      return arrow::fixed_size_list(arrow::int32(), list_size);
+    } else if (type_upper.find("LONG") == type_prefix_length) {
+      int32_t list_size = std::stoi(type_upper.substr(type_prefix_length + 4));
+      return arrow::fixed_size_list(arrow::int64(), list_size);
+    } else if (type_upper.find("FLOAT") == type_prefix_length) {
+      int32_t list_size = std::stoi(type_upper.substr(type_prefix_length + 5));
+      return arrow::fixed_size_list(arrow::float32(), list_size);
+    } else if (type_upper.find("DOUBLE") == type_prefix_length) {
+      int32_t list_size = std::stoi(type_upper.substr(type_prefix_length + 6));
+      return arrow::fixed_size_list(arrow::float64(), list_size);
+    } else if (type_upper.find("STRING") == type_prefix_length) {
+      int32_t list_size = std::stoi(type_upper.substr(type_prefix_length + 6));
+      return arrow::fixed_size_list(arrow::large_utf8(), list_size);
+    } else {
+      LOG(ERROR) << "Unsupported property type: '" << type_upper << "'";
+      return arrow::null();
+    }
   } else if (type_upper == "NULL") {
     return arrow::null();
   } else {
@@ -146,8 +168,7 @@ json Entry::PropertyDef::ToJSON() const {
   json root;
   root["id"] = id;
   root["name"] = name;
-  auto type_str = detail::PropertyTypeToString(type);
-  root["data_type"] = type_str;
+  root["data_type"] = detail::PropertyTypeToString(type);
   return root;
 }
 
@@ -490,6 +511,22 @@ Entry& PropertyGraphSchema::GetMutableEntry(const LabelId label_id,
 }
 
 std::vector<Entry> PropertyGraphSchema::vertex_entries() const {
+  return ValidVertexEntries();
+}
+
+std::vector<Entry> PropertyGraphSchema::edge_entries() const {
+  return ValidEdgeEntries();
+}
+
+std::vector<Entry> PropertyGraphSchema::AllVertexEntries() const {
+  return vertex_entries_;
+}
+
+std::vector<Entry> PropertyGraphSchema::AllEdgeEntries() const {
+  return edge_entries_;
+}
+
+std::vector<Entry> PropertyGraphSchema::ValidVertexEntries() const {
   std::vector<Entry> res;
   for (size_t i = 0; i < valid_vertices_.size(); ++i) {
     if (valid_vertices_[i]) {
@@ -499,7 +536,7 @@ std::vector<Entry> PropertyGraphSchema::vertex_entries() const {
   return res;
 }
 
-std::vector<Entry> PropertyGraphSchema::edge_entries() const {
+std::vector<Entry> PropertyGraphSchema::ValidEdgeEntries() const {
   std::vector<Entry> res;
   for (size_t i = 0; i < valid_edges_.size(); ++i) {
     if (valid_edges_[i]) {
@@ -507,6 +544,14 @@ std::vector<Entry> PropertyGraphSchema::edge_entries() const {
     }
   }
   return res;
+}
+
+bool PropertyGraphSchema::IsVertexValid(const LabelId label_id) const {
+  return valid_vertices_[label_id];
+}
+
+bool PropertyGraphSchema::IsEdgeValid(const LabelId label_id) const {
+  return valid_edges_[label_id];
 }
 
 std::vector<std::string> PropertyGraphSchema::GetVertexLabels() const {

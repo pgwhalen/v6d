@@ -90,11 +90,11 @@ class ClientManager {
     auto connect_status =
         this->ConnectImpl(client, endpoint, session_id, username, password);
     if (PyErr_CheckSignals() != 0) {
-      // The method `Connect` will keep retrying, we need to propogate
+      // The method `Connect` will keep retrying, we need to propagate
       // the Ctrl-C when during the C++ code run retries.
       throw py::error_already_set();
     }
-    // propogate the KeyboardInterrupt exception correctly before the
+    // propagate the KeyboardInterrupt exception correctly before the
     // RuntimeError
     throw_on_error(connect_status);
     client_set_.emplace(endpoint_key, client);
@@ -413,6 +413,39 @@ void bind_client(py::module& mod) {
           },
           "object_id"_a)
       .def("clear", [](ClientBase* self) { throw_on_error(self->Clear()); })
+      .def(
+          "label",
+          [](ClientBase* self, ObjectID id, std::string const& key,
+             std::string const& value) -> void {
+            throw_on_error(self->Label(id, key, value));
+          },
+          "object"_a, "key"_a, "value"_a)
+      .def(
+          "label",
+          [](ClientBase* self, ObjectID id,
+             std::map<std::string, std::string> const& labels) -> void {
+            throw_on_error(self->Label(id, labels));
+          },
+          "object"_a, "labels"_a)
+      .def(
+          "evict",
+          [](ClientBase* self, std::vector<ObjectID> const& objects) -> void {
+            throw_on_error(self->Evict(objects));
+          },
+          "objects"_a)
+      .def(
+          "load",
+          [](ClientBase* self, std::vector<ObjectID> const& objects,
+             const bool pin) -> void {
+            throw_on_error(self->Load(objects, pin));
+          },
+          "objects"_a, py::arg("pin") = false)
+      .def(
+          "unpin",
+          [](ClientBase* self, std::vector<ObjectID> const& objects) -> void {
+            throw_on_error(self->Unpin(objects));
+          },
+          "objects"_a)
       .def("reset", [](ClientBase* self) { throw_on_error(self->Clear()); })
       .def_property_readonly("connected", &Client::Connected)
       .def_property_readonly("instance_id", &Client::instance_id)

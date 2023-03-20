@@ -94,7 +94,7 @@ Status ClientBase::CreateMetaData(ObjectMeta& meta_data,
     }
   }
   // nbytes is optional
-  if (!meta_data.Haskey("nbytes")) {
+  if (!meta_data.HasKey("nbytes")) {
     meta_data.SetNBytes(0);
   }
   // if the metadata has incomplete components, trigger an remote meta sync.
@@ -363,6 +363,58 @@ Status ClientBase::Clear() {
   json message_in;
   RETURN_ON_ERROR(doRead(message_in));
   RETURN_ON_ERROR(ReadClearReply(message_in));
+  return Status::OK();
+}
+
+Status ClientBase::Label(const ObjectID object, std::string const& key,
+                         std::string const& value) {
+  std::string message_out;
+  WriteLabelRequest(object, key, value, message_out);
+  RETURN_ON_ERROR(doWrite(message_out));
+  json message_in;
+  RETURN_ON_ERROR(doRead(message_in));
+  RETURN_ON_ERROR(ReadLabelReply(message_in));
+  return Status::OK();
+}
+
+Status ClientBase::Label(const ObjectID object,
+                         std::map<std::string, std::string> const& labels) {
+  std::string message_out;
+  WriteLabelRequest(object, labels, message_out);
+  RETURN_ON_ERROR(doWrite(message_out));
+  json message_in;
+  RETURN_ON_ERROR(doRead(message_in));
+  RETURN_ON_ERROR(ReadLabelReply(message_in));
+  return Status::OK();
+}
+
+Status ClientBase::Evict(std::vector<ObjectID> const& objects) {
+  std::string message_out;
+  WriteEvictRequest(objects, message_out);
+  RETURN_ON_ERROR(doWrite(message_out));
+  json message_in;
+  RETURN_ON_ERROR(doRead(message_in));
+  RETURN_ON_ERROR(ReadEvictReply(message_in));
+  return Status::OK();
+}
+
+Status ClientBase::Load(std::vector<ObjectID> const& objects, const bool pin) {
+  std::string message_out;
+  WriteLoadRequest(objects, pin, message_out);
+  RETURN_ON_ERROR(doWrite(message_out));
+  json message_in;
+  RETURN_ON_ERROR(doRead(message_in));
+  RETURN_ON_ERROR(ReadLoadReply(message_in));
+  return Status::OK();
+}
+
+Status ClientBase::Unpin(std::vector<ObjectID> const& objects) {
+  std::string message_out;
+  WriteUnpinRequest(objects, message_out);
+  RETURN_ON_ERROR(doWrite(message_out));
+  json message_in;
+  RETURN_ON_ERROR(doRead(message_in));
+  RETURN_ON_ERROR(ReadUnpinReply(message_in));
   return Status::OK();
 }
 

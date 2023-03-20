@@ -223,12 +223,12 @@ boost::leaf::result<ObjectID> ConstructFragmentGroup(
 
     ObjectMeta meta;
     if (client.GetMetaData(frag_id, meta).ok()) {
-      if (meta.Haskey("vertex_label_num_")) {
+      if (meta.HasKey("vertex_label_num_")) {
         vertex_label_num =
             meta.GetKeyValue<typename ArrowFragmentBase::label_id_t>(
                 "vertex_label_num_");
       }
-      if (meta.Haskey("edge_label_num_")) {
+      if (meta.HasKey("edge_label_num_")) {
         edge_label_num =
             meta.GetKeyValue<typename ArrowFragmentBase::label_id_t>(
                 "edge_label_num_");
@@ -243,9 +243,9 @@ boost::leaf::result<ObjectID> ConstructFragmentGroup(
           gathered_instance_ids[comm_spec.FragToWorker(i)]);
     }
 
-    auto group_object =
-        std::dynamic_pointer_cast<ArrowFragmentGroup>(builder.Seal(client));
-    group_object_id = group_object->id();
+    std::shared_ptr<Object> fragment_group_object;
+    VY_OK_OR_RAISE(builder.Seal(client, fragment_group_object));
+    group_object_id = fragment_group_object->id();
     VY_OK_OR_RAISE(client.Persist(group_object_id));
 
     MPI_Bcast(&group_object_id, sizeof(ObjectID), MPI_CHAR, 0,
@@ -263,6 +263,95 @@ boost::leaf::result<ObjectID> ConstructFragmentGroup(
   MPI_Barrier(comm_spec.comm());
   VINEYARD_DISCARD(client.SyncMetaData());
   return group_object_id;
+}
+
+EdgeTableInfo FlattenTableInfos(const std::vector<EdgeTableInfo>& edge_tables) {
+  if (edge_tables.size() == 1) {
+    return edge_tables[0];
+  }
+  std::vector<std::shared_ptr<arrow::Table>> adj_list_tables;
+  std::vector<std::shared_ptr<arrow::Table>> property_tables;
+  for (auto& table : edge_tables) {
+    adj_list_tables.push_back(table.adj_list_table);
+    property_tables.push_back(table.property_table);
+  }
+  auto adj_list_table = arrow::ConcatenateTables(adj_list_tables).ValueOrDie();
+  // auto offsets_array = parallel_prefix_sum_chunks(offsets,
+  // adj_list_table->num_rows());
+  auto property_table = arrow::ConcatenateTables(property_tables).ValueOrDie();
+  return EdgeTableInfo(adj_list_table, nullptr, property_table, 0, true);
+}
+
+std::pair<int64_t, int64_t> BinarySearchChunkPair(
+    const std::vector<int64_t>& agg_num, int64_t got) {
+  // binary search;
+  size_t low = 0, high = agg_num.size() - 1;
+  while (low <= high) {
+    size_t mid = (low + high) / 2;
+    if (agg_num[mid] <= got &&
+        (mid == agg_num.size() - 1 || agg_num[mid + 1] > got)) {
+      return std::make_pair(mid, got - agg_num[mid]);
+    } else if (agg_num[mid] > got) {
+      high = mid - 1;
+    } else {
+      low = mid + 1;
+    }
+  }
+  return std::make_pair(low, got - agg_num[low]);
+}
+
+Status parallel_prefix_sum_chunks(
+    std::vector<std::shared_ptr<arrow::Int64Array>>& in_chunks,
+    std::shared_ptr<arrow::Int64Array>& out) {
+  if (in_chunks.size() == 1) {
+    out = in_chunks[0];
+    return Status::OK();
+  }
+  std::vector<int64_t> block_sum(in_chunks.size());
+  size_t bsize = static_cast<size_t>(in_chunks[0]->length() - 1);
+  size_t chunk_size = in_chunks.size();
+  int thread_num = static_cast<int>(chunk_size);
+  block_sum[0] = in_chunks[0]->Value(in_chunks[0]->length() - 1);
+  size_t length = in_chunks[0]->length();
+  for (size_t i = 1; i < in_chunks.size(); ++i) {
+    block_sum[i] =
+        block_sum[i - 1] + in_chunks[i]->Value(in_chunks[i]->length() - 1);
+    length += in_chunks[i]->length() - 1;
+  }
+
+  std::unique_ptr<arrow::Buffer> buffer;
+  RETURN_ON_ARROW_ERROR_AND_ASSIGN(
+      buffer, arrow::AllocateBuffer(length * sizeof(int64_t)));
+  int64_t* builder = reinterpret_cast<int64_t*>(buffer->mutable_data());
+  auto block_add = [&](int i) {
+    size_t begin = std::min(static_cast<size_t>(i) * bsize, length);
+    size_t end = std::min(begin + bsize, length);
+    if (i == 0) {
+      for (; begin < end; ++begin) {
+        builder[begin] =
+            in_chunks[i]->Value(begin - static_cast<size_t>(i) * bsize);
+      }
+    } else {
+      for (; begin < end; ++begin) {
+        builder[begin] =
+            in_chunks[i]->Value(begin - static_cast<size_t>(i) * bsize) +
+            block_sum[i - 1];
+      }
+    }
+  };
+
+  std::vector<std::thread> threads_sum;
+  for (int i = 0; i < thread_num; ++i) {
+    threads_sum.emplace_back(block_add, i);
+  }
+  for (auto& thrd : threads_sum) {
+    thrd.join();
+  }
+  // the last element is the total sum
+  builder[length - 1] = block_sum[chunk_size - 1];
+  out = std::make_shared<arrow::Int64Array>(length, std::move(buffer), nullptr,
+                                            0);
+  return Status::OK();
 }
 
 }  // namespace vineyard

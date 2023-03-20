@@ -40,14 +40,14 @@ def pytest_addoption(parser):
         "--vineyard-ipc-sockets",
         action="store",
         default='/tmp/vineyard.sock',
-        help='Location of vineyard IPC sockets, seperated by ","',
+        help='Location of vineyard IPC sockets, separated by ","',
     )
 
     parser.addoption(
         "--vineyard-endpoints",
         action="store",
         default='127.0.0.1:9600',
-        help='Address of vineyard RPC endpoints, seperated by ","',
+        help='Address of vineyard RPC endpoints, separated by ","',
     )
 
 
@@ -84,3 +84,14 @@ pytest_plugins = []
 def pytest_sessionfinish(session, exitstatus):
     if exitstatus == 5:
         session.exitstatus = 0
+
+
+def pytest_collection_modifyitems(items):
+    for item in items:
+        timeout_marker = None
+        if hasattr(item, "get_closest_marker"):
+            timeout_marker = item.get_closest_marker("timeout")
+        elif hasattr(item, "get_marker"):
+            timeout_marker = item.get_marker("timeout")
+        if timeout_marker is None:
+            item.add_marker(pytest.mark.timeout(600))

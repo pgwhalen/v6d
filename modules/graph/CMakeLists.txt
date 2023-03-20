@@ -1,7 +1,6 @@
 include(GNUInstallDirs)
 
 # build vineyard-graph
-
 file(GLOB_RECURSE VINEYARD_MOD_SRCS "${CMAKE_CURRENT_SOURCE_DIR}"
                                     "*.vineyard-mod")
 
@@ -48,6 +47,7 @@ file(GLOB_RECURSE GRAPH_SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}" "fragment/*.cc"
                                                                 "loader/*.cc"
                                                                 "utils/*.cc"
                                                                 "vertex_map/*.cc"
+                                                                "writer/*.cc"
 )
 
 message(${GRAPH_SRC_FILES})
@@ -78,6 +78,24 @@ else()
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/boost-leaf/include>
         $<INSTALL_INTERFACE:include/vineyard/contrib>
     )
+endif()
+
+if(BUILD_VINEYARD_GRAPH_WITH_GAR)
+    target_compile_definitions(vineyard_graph PUBLIC -DENABLE_GAR)
+    find_package(gar QUIET)
+    if (gar_FOUND)
+        message(STATUS "-- Found GraphAr: ${GAR_LIBRARIES}")
+        target_include_directories(vineyard_graph PUBLIC ${GAR_INCLUDE_DIRS})
+        target_link_libraries(vineyard_graph PUBLIC ${GAR_LIBRARIES})
+    else()
+        # build and install gar
+        message(STATUS "-- Building GraphAr from submodule: ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/GraphAr")
+        add_subdirectory_static("${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/GraphAr/cpp"
+                                "${CMAKE_CURRENT_BINARY_DIR}/thirdparty/GraphAr"
+        )
+        # depends on gar
+        target_link_libraries(vineyard_graph PUBLIC gar)
+    endif()
 endif()
 
 target_include_directories(vineyard_graph PUBLIC
@@ -114,6 +132,9 @@ add_executable(vineyard-graph-loader ${GRAPH_LOADER_SRC_FILES})
 target_link_libraries(vineyard-graph-loader PRIVATE vineyard_graph)
 install_vineyard_target(vineyard-graph-loader)
 
+add_custom_target(vineyard_graph_tests)
+add_dependencies(vineyard_tests vineyard_graph_tests)
+
 if(BUILD_VINEYARD_TESTS)
     enable_testing()
     file(GLOB TEST_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/test" "${CMAKE_CURRENT_SOURCE_DIR}/test/*.cc")
@@ -134,6 +155,6 @@ if(BUILD_VINEYARD_TESTS)
             target_link_libraries(${T_NAME} PRIVATE ${LIBUNWIND_LIBRARIES})
         endif()
         add_test(${T_NAME}, ${T_NAME})
-        add_dependencies(vineyard_tests ${T_NAME})
+        add_dependencies(vineyard_graph_tests ${T_NAME})
     endforeach()
 endif()

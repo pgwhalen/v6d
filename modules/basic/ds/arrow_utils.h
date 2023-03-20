@@ -252,6 +252,13 @@ Status ConcatenateTables(
     std::shared_ptr<arrow::Table>& table);
 
 /**
+ * @brief Concatenate multiple arrow tables into one in column wise.
+ */
+Status ConcatenateTablesColumnWise(
+    const std::vector<std::shared_ptr<arrow::Table>>& tables,
+    std::shared_ptr<arrow::Table>& table);
+
+/**
  * @brief Add extra metadata mapping to existing recordbatch.
  */
 std::shared_ptr<arrow::RecordBatch> AddMetadataToRecordBatch(
@@ -323,6 +330,31 @@ Status ConsolidateColumns(const std::shared_ptr<arrow::Table>& table,
 
 Status ConsolidateColumns(const std::shared_ptr<arrow::Table>& table,
                           std::shared_ptr<arrow::Table>& out);
+
+namespace arrow_shim {
+
+/**
+ * @brief Textual schema representation.
+ *
+ * @see
+ * https://github.com/apache/arrow-rs/blob/27f4762c8794ef1c5d042933562185980eb85ae5/arrow/src/datatypes/datatype.rs#L536
+ */
+Status SchemaToJSON(const std::shared_ptr<arrow::Schema>& schema, json& object);
+
+Status SchemaFromJSON(const json& object,
+                      std::shared_ptr<arrow::Schema>& schema);
+
+Status DataTypeToJSON(const std::shared_ptr<arrow::DataType>& datatype,
+                      json& object);
+
+Status DataTypeFromJSON(const json& object,
+                        std::shared_ptr<arrow::DataType>& datatype);
+
+Status FieldToJSON(const std::shared_ptr<arrow::Field>& field, json& object);
+
+Status FieldFromJSON(const json& object, std::shared_ptr<arrow::Field>& field);
+
+}  // namespace arrow_shim
 
 }  // namespace vineyard
 
