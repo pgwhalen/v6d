@@ -1,0 +1,1685 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta property="og:title" content="vineyardctl" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="notes/cloud-native/vineyardctl.html" />
+<meta property="og:site_name" content="vineyard" />
+<meta property="og:description" content="vineyardctl is the command-line tool for interact with the Vineyard Operator. Synopsis: vineyardctl is the command-line tool for working with the Vineyard Operator. It supports creating, deleting a..." />
+<meta property="og:image:width" content="1146" />
+<meta property="og:image:height" content="600" />
+<meta property="og:image" content="/_images/social_previews/summary_notes_cloud-native_vineyardctl_81b03e4a.png" />
+<meta property="og:image:alt" content="vineyardctl is the command-line tool for interact with the Vineyard Operator. Synopsis: vineyardctl is the command-line tool for working with the Vineyard Op..." />
+<meta name="description" content="vineyardctl is the command-line tool for interact with the Vineyard Operator. Synopsis: vineyardctl is the command-line tool for working with the Vineyard Operator. It supports creating, deleting a..." />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Data processing" href="../../tutorials/data-processing.html" /><link rel="prev" title="Vineyard Operator" href="vineyard-operator.html" />
+
+    <link rel="shortcut icon" href="../../_static/vineyard.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2023.03.27 -->
+        <title>vineyardctl - Vineyard</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/brands.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/v4-shims.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/panels.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+<script>
+  document.body.dataset.theme = "light";
+</script>
+
+<script>
+  function ready(callback) {
+    if (document.readyState!='loading') {
+      // in case the document is already rendered
+      callback();
+    } else if (document.addEventListener) {
+      // modern browsers
+      document.addEventListener('DOMContentLoaded', callback);
+    } else document.attachEvent('onreadystatechange', function() {
+      // IE <= 8
+      if (document.readyState=='complete') {
+        callback();
+      }
+    });
+  }
+
+  ready(function() {
+    let coll = document.getElementsByClassName("admonition-details");
+    for (let i = 0; i < coll.length; i++) {
+      let titles = coll[i].getElementsByClassName("admonition-title");
+      if (titles.length == 0) {
+        continue;
+      }
+      titles[0].addEventListener("click", function () {
+        this.parentElement.classList.toggle("active");
+
+        if (this.parentElement.classList.contains("active")) {
+          this.getElementsByClassName("admonition-caret")[0].innerText = " - (click to collapse)";
+        } else {
+          this.getElementsByClassName("admonition-caret")[0].innerText = " + (click to expand)";
+        }
+      });
+      titles[0].appendChild(document.createElement("br"));
+      let caret = document.createElement("span");
+      caret.classList.add("admonition-caret");
+      caret.innerText = " + (click to expand)";
+      titles[0].appendChild(caret);
+    }
+  });
+</script>
+
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">Vineyard</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/vineyard-logo-h.png" alt="Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../key-concepts.html">Key Concepts</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../key-concepts/objects.html">Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../key-concepts/vcdl.html">Code Generation for Boilerplate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../key-concepts/data-accessing.html">Data Accessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../key-concepts/streams.html">Streams in Vineyard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../key-concepts/io-drivers.html">I/O Drivers</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Cloud-Native</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="deploy-kubernetes.html">Deploy on Kubernetes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vineyard-operator.html">Vineyard Operator</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal">Command-line tool</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/data-processing.html">Data processing</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/data-processing/using-objects-python.html">Sharing Python Objects with Vineyard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/data-processing/python-sharedmemory.html"><code class="code docutils literal notranslate"><span class="pre">multiprocessing.shared_memory</span></code> in Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/data-processing/distributed-learning.html">Distributed Learning with Vineyard</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/kubernetes.html">Vineyard on Kubernetes</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/kubernetes/using-vineyard-operator.html">Use vineyard operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/kubernetes/ml-pipeline-mars-pytorch.html">Machine learning with Vineyard on Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/extending.html">Extending vineyard</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/extending/define-datatypes-python.html">Define Data Types in Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/extending/define-datatypes-cpp.html">Defining Custom Data Types in C++</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Integration</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../integration-bigdata.html">Big-data on Vineyard</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../integration/dask.html">Dask on Vineyard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../integration/ml.html">Machine Learning with Vineyard</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../integration-orchestration.html">Workflow orchestration</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../integration/airflow.html">Airflow on Vineyard</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../references.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../references/python-api.html">Python API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../references/cpp-api.html">C++ API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../references/ctl.html">Vineyard Cli</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Guides</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../developers.html">Getting Involved</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../developers/build-from-source.html">Building from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../developers/contributing.html">Contributing to vineyard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../developers/troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../developers/roadmap.html">Roadmap</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/faq.html">Frequently Asked Questions</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/v6d-io/v6d/edit/main/docs/notes/cloud-native/vineyardctl.md" title="Edit this page">
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+    </svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <div class="tex2jax_ignore mathjax_ignore section" id="vineyardctl">
+<h1><code class="docutils literal notranslate"><span class="pre">vineyardctl</span></code><a class="headerlink" href="#vineyardctl" title="Permalink to this heading">#</a></h1>
+<p>vineyardctl is the command-line tool for interact with the Vineyard Operator.</p>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this heading">#</a></h2>
+<p>vineyardctl is the command-line tool for working with the
+Vineyard Operator. It supports creating, deleting and checking
+status of Vineyard Operator. It also supports managing the
+vineyard relevant components such as vineyardd and pluggable
+drivers.</p>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-create"><span class="xref myst">vineyardctl create</span></a>	 - Create a vineyard jobs on kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-delete"><span class="xref myst">vineyardctl delete</span></a>	 - Delete the vineyard components from kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-deploy"><span class="xref myst">vineyardctl deploy</span></a>	 - Deploy the vineyard components on kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-inject"><span class="xref myst">vineyardctl inject</span></a>	 - Inject the vineyard sidecar container into a workload</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-manager"><span class="xref myst">vineyardctl manager</span></a>	 - Start the manager of vineyard operator</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-schedule"><span class="xref myst">vineyardctl schedule</span></a>	 - Schedule a workload or a workflow to existing vineyard cluster.</p></li>
+</ul>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this heading">#</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>      <span class="o">--</span><span class="n">create</span><span class="o">-</span><span class="n">namespace</span>    <span class="n">create</span> <span class="n">the</span> <span class="n">namespace</span> <span class="k">if</span> <span class="n">it</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">exist</span><span class="p">,</span> <span class="n">default</span> <span class="n">false</span>
+  <span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="o">--</span><span class="n">dump</span><span class="o">-</span><span class="n">usage</span>          <span class="n">Dump</span> <span class="n">usage</span> <span class="ow">in</span> <span class="n">JSON</span>
+  <span class="o">-</span><span class="n">g</span><span class="p">,</span> <span class="o">--</span><span class="n">gen</span><span class="o">-</span><span class="n">doc</span>             <span class="n">Generate</span> <span class="n">reference</span> <span class="n">docs</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="p">,</span> <span class="s2">&quot;./cmd/README.md&quot;</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                <span class="n">help</span> <span class="k">for</span> <span class="n">vineyardctl</span>
+      <span class="o">--</span><span class="n">kubeconfig</span> <span class="n">string</span>   <span class="n">kubeconfig</span> <span class="n">path</span> <span class="k">for</span> <span class="n">the</span> <span class="n">kubernetes</span> <span class="n">cluster</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;$HOME/.kube/config&quot;</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">n</span><span class="p">,</span> <span class="o">--</span><span class="n">namespace</span> <span class="n">string</span>    <span class="n">the</span> <span class="n">namespace</span> <span class="k">for</span> <span class="n">operation</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyard-system&quot;</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">v</span><span class="p">,</span> <span class="o">--</span><span class="n">version</span>             <span class="n">version</span> <span class="k">for</span> <span class="n">vineyardctl</span>
+      <span class="o">--</span><span class="n">wait</span>                <span class="n">wait</span> <span class="k">for</span> <span class="n">the</span> <span class="n">kubernetes</span> <span class="n">resource</span> <span class="n">to</span> <span class="n">be</span> <span class="n">ready</span><span class="p">,</span> <span class="n">default</span> <span class="n">true</span> <span class="p">(</span><span class="n">default</span> <span class="n">true</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="vineyardctl-create">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">create</span></code><a class="headerlink" href="#vineyardctl-create" title="Permalink to this heading">#</a></h2>
+<p>Create a vineyard jobs on kubernetes</p>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal"><span class="doc std std-doc">vineyardctl</span></a>	 - vineyardctl is the command-line tool for interact with the Vineyard Operator.</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-create-backup"><span class="xref myst">vineyardctl create backup</span></a>	 - Backup the current vineyard cluster on kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-create-operation"><span class="xref myst">vineyardctl create operation</span></a>	 - Insert an operation in a workflow based on vineyard cluster</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-create-recover"><span class="xref myst">vineyardctl create recover</span></a>	 - Recover the current vineyard cluster on kubernetes</p></li>
+</ul>
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># create the backup job on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>create<span class="w"> </span>backup<span class="w"> </span>--vineyardd-name<span class="w"> </span>vineyardd-sample<span class="w"> </span>--vineyardd-namespace<span class="w"> </span>vineyard-system
+
+<span class="w">  </span><span class="c1"># create the recover job on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>create<span class="w"> </span>recover<span class="w"> </span>--backup-name<span class="w"> </span>vineyardd-sample<span class="w"> </span>-n<span class="w"> </span>vineyard-system
+
+<span class="w">  </span><span class="c1"># create the operation job on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>create<span class="w"> </span>operation<span class="w"> </span>--name<span class="w"> </span>assembly<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--type<span class="w"> </span><span class="nb">local</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--require<span class="w"> </span>job1<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--target<span class="w"> </span>job2<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--timeoutSeconds<span class="w"> </span><span class="m">600</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>Options<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>   <span class="n">help</span> <span class="k">for</span> <span class="n">create</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-create-backup">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">create</span> <span class="pre">backup</span></code><a class="headerlink" href="#vineyardctl-create-backup" title="Permalink to this heading">#</a></h2>
+<p>Backup the current vineyard cluster on kubernetes</p>
+<div class="section" id="id2">
+<h3>Synopsis<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<p>Backup the current vineyard cluster on kubernetes. You could
+backup all objects of the current vineyard cluster quickly.
+For persistent storage, you could specify the pv spec and pv
+spec.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">create</span> <span class="n">backup</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-create"><span class="xref myst">vineyardctl create</span></a>	 - Create a vineyard jobs on kubernetes</p></li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h3>Examples<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># create a backup job for the vineyard cluster on kubernetes</span>
+<span class="w">  </span><span class="c1"># you could define the pv and pvc spec from json string as follows</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>create<span class="w"> </span>backup<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd-name<span class="w"> </span>vineyardd-sample<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd-namespace<span class="w"> </span>vineyard-system<span class="w">  </span><span class="se">\</span>
+<span class="w">    </span>--limit<span class="w"> </span><span class="m">1000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--path<span class="w"> </span>/var/vineyard/dump<span class="w">  </span><span class="se">\</span>
+<span class="w">    </span>--pv-pvc-spec<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">      &quot;pv-spec&quot;: {</span>
+<span class="s1">        &quot;capacity&quot;: {</span>
+<span class="s1">          &quot;storage&quot;: &quot;1Gi&quot;</span>
+<span class="s1">        },</span>
+<span class="s1">        &quot;accessModes&quot;: [</span>
+<span class="s1">          &quot;ReadWriteOnce&quot;</span>
+<span class="s1">        ],</span>
+<span class="s1">        &quot;storageClassName&quot;: &quot;manual&quot;,</span>
+<span class="s1">        &quot;hostPath&quot;: {</span>
+<span class="s1">          &quot;path&quot;: &quot;/var/vineyard/dump&quot;</span>
+<span class="s1">        }</span>
+<span class="s1">      },</span>
+<span class="s1">      &quot;pvc-spec&quot;: {</span>
+<span class="s1">        &quot;storageClassName&quot;: &quot;manual&quot;,</span>
+<span class="s1">        &quot;accessModes&quot;: [</span>
+<span class="s1">          &quot;ReadWriteOnce&quot;</span>
+<span class="s1">        ],</span>
+<span class="s1">        &quot;resources&quot;: {</span>
+<span class="s1">          &quot;requests&quot;: {</span>
+<span class="s1">          &quot;storage&quot;: &quot;1Gi&quot;</span>
+<span class="s1">          }</span>
+<span class="s1">        }</span>
+<span class="s1">      }</span>
+<span class="s1">      }&#39;</span>
+
+<span class="w">  </span><span class="c1"># create a backup job for the vineyard cluster on kubernetes</span>
+<span class="w">  </span><span class="c1"># you could define the pv and pvc spec from yaml string as follows</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>create<span class="w"> </span>backup<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd-name<span class="w"> </span>vineyardd-sample<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd-namespace<span class="w"> </span>vineyard-system<span class="w">  </span><span class="se">\</span>
+<span class="w">    </span>--limit<span class="w"> </span><span class="m">1000</span><span class="w"> </span>--path<span class="w"> </span>/var/vineyard/dump<span class="w">  </span><span class="se">\</span>
+<span class="w">    </span>--pv-pvc-spec<span class="w">  </span><span class="se">\</span>
+<span class="w">    </span><span class="s1">&#39;</span>
+<span class="s1">    pv-spec:</span>
+<span class="s1">    capacity:</span>
+<span class="s1">      storage: 1Gi</span>
+<span class="s1">    accessModes:</span>
+<span class="s1">    - ReadWriteOnce</span>
+<span class="s1">    storageClassName: manual</span>
+<span class="s1">    hostPath:</span>
+<span class="s1">      path: &quot;/var/vineyard/dump&quot;</span>
+<span class="s1">    pvc-spec:</span>
+<span class="s1">    storageClassName: manual</span>
+<span class="s1">    accessModes:</span>
+<span class="s1">    - ReadWriteOnce</span>
+<span class="s1">    resources:</span>
+<span class="s1">      requests:</span>
+<span class="s1">      storage: 1Gi</span>
+<span class="s1">    &#39;</span>
+
+<span class="w">  </span><span class="c1"># create a backup job for the vineyard cluster on kubernetes</span>
+<span class="w">  </span><span class="c1"># you could define the pv and pvc spec from json file as follows</span>
+<span class="w">  </span><span class="c1"># also you could use yaml file instead of json file</span>
+<span class="w">  </span>cat<span class="w"> </span>pv-pvc.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>vineyardctl<span class="w"> </span>create<span class="w"> </span>backup<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd-name<span class="w"> </span>vineyardd-sample<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd-namespace<span class="w"> </span>vineyard-system<span class="w">  </span><span class="se">\</span>
+<span class="w">    </span>--limit<span class="w"> </span><span class="m">1000</span><span class="w"> </span>--path<span class="w"> </span>/var/vineyard/dump<span class="w">  </span><span class="se">\</span>
+<span class="w">    </span>-
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h3>Options<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>      <span class="o">--</span><span class="n">backup</span><span class="o">-</span><span class="n">name</span> <span class="n">string</span>           <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">backup</span> <span class="n">job</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyard-backup&quot;</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                         <span class="n">help</span> <span class="k">for</span> <span class="n">backup</span>
+      <span class="o">--</span><span class="n">limit</span> <span class="nb">int</span>                    <span class="n">the</span> <span class="n">limit</span> <span class="n">of</span> <span class="n">objects</span> <span class="n">to</span> <span class="n">backup</span> <span class="p">(</span><span class="n">default</span> <span class="mi">1000</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">path</span> <span class="n">string</span>                  <span class="n">the</span> <span class="n">path</span> <span class="n">of</span> <span class="n">the</span> <span class="n">backup</span> <span class="n">data</span>
+      <span class="o">--</span><span class="n">pv</span><span class="o">-</span><span class="n">pvc</span><span class="o">-</span><span class="n">spec</span> <span class="n">string</span>           <span class="n">the</span> <span class="n">PersistentVolume</span> <span class="ow">and</span> <span class="n">PersistentVolumeClaim</span> <span class="n">of</span> <span class="n">the</span> <span class="n">backup</span> <span class="n">data</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">-</span><span class="n">name</span> <span class="n">string</span>        <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">vineyardd</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">-</span><span class="n">namespace</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">namespace</span> <span class="n">of</span> <span class="n">vineyardd</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-create-operation">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">create</span> <span class="pre">operation</span></code><a class="headerlink" href="#vineyardctl-create-operation" title="Permalink to this heading">#</a></h2>
+<p>Insert an operation in a workflow based on vineyard cluster</p>
+<div class="section" id="id5">
+<h3>Synopsis<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
+<p>Insert an operation in a workflow based on vineyard cluster.
+You could create a assembly or repartition operation in a
+workflow. Usually, the operation should be created between
+the workloads: job1 -&gt; operation -&gt; job2.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">create</span> <span class="n">operation</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-create"><span class="xref myst">vineyardctl create</span></a>	 - Create a vineyard jobs on kubernetes</p></li>
+</ul>
+</div>
+<div class="section" id="id6">
+<h3>Examples<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># create a local assembly operation between job1 and job2</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>create<span class="w"> </span>operation<span class="w"> </span>--name<span class="w"> </span>assembly<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--type<span class="w"> </span><span class="nb">local</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--require<span class="w"> </span>job1<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--target<span class="w"> </span>job2<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--timeoutSeconds<span class="w"> </span><span class="m">600</span>
+
+<span class="w">  </span><span class="c1"># create a distributed assembly operation between job1 and job2</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>create<span class="w"> </span>operation<span class="w"> </span>--name<span class="w"> </span>assembly<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--type<span class="w"> </span>distributed<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--require<span class="w"> </span>job1<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--target<span class="w"> </span>job2<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--timeoutSeconds<span class="w"> </span><span class="m">600</span>
+
+<span class="w">  </span><span class="c1"># create a dask repartition operation between job1 and job2</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>create<span class="w"> </span>operation<span class="w"> </span>--name<span class="w"> </span>repartition<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--type<span class="w"> </span>dask<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--require<span class="w"> </span>job1<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--target<span class="w"> </span>job2<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--timeoutSeconds<span class="w"> </span><span class="m">600</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h3>Options<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                 <span class="n">help</span> <span class="k">for</span> <span class="n">operation</span>
+      <span class="o">--</span><span class="n">kind</span> <span class="n">string</span>          <span class="n">the</span> <span class="n">kind</span> <span class="n">of</span> <span class="n">operation</span><span class="p">,</span> <span class="n">including</span> <span class="s2">&quot;assembly&quot;</span> <span class="ow">and</span> <span class="s2">&quot;repartition&quot;</span>
+      <span class="o">--</span><span class="n">name</span> <span class="n">string</span>          <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">operation</span>
+      <span class="o">--</span><span class="n">require</span> <span class="n">string</span>       <span class="n">the</span> <span class="n">job</span> <span class="n">that</span> <span class="n">need</span> <span class="n">an</span> <span class="n">operation</span> <span class="n">to</span> <span class="n">be</span> <span class="n">executed</span>
+      <span class="o">--</span><span class="n">target</span> <span class="n">string</span>        <span class="n">the</span> <span class="n">job</span> <span class="n">that</span> <span class="n">need</span> <span class="n">to</span> <span class="n">be</span> <span class="n">executed</span> <span class="n">before</span> <span class="n">this</span> <span class="n">operation</span>
+      <span class="o">--</span><span class="n">timeoutSeconds</span> <span class="nb">int</span>   <span class="n">the</span> <span class="n">timeout</span> <span class="n">seconds</span> <span class="n">of</span> <span class="n">operation</span> <span class="p">(</span><span class="n">default</span> <span class="mi">600</span><span class="p">)</span>
+      <span class="o">--</span><span class="nb">type</span> <span class="n">string</span>          <span class="n">the</span> <span class="nb">type</span> <span class="n">of</span> <span class="n">operation</span><span class="p">:</span> <span class="k">for</span> <span class="n">assembly</span><span class="p">,</span> <span class="n">it</span> <span class="n">can</span> <span class="n">be</span> <span class="s2">&quot;local&quot;</span> <span class="ow">or</span> <span class="s2">&quot;distributed&quot;</span><span class="p">;</span> <span class="k">for</span> <span class="n">repartition</span><span class="p">,</span> <span class="n">it</span> <span class="n">can</span> <span class="n">be</span> <span class="s2">&quot;dask&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-create-recover">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">create</span> <span class="pre">recover</span></code><a class="headerlink" href="#vineyardctl-create-recover" title="Permalink to this heading">#</a></h2>
+<p>Recover the current vineyard cluster on kubernetes</p>
+<div class="section" id="id8">
+<h3>Synopsis<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h3>
+<p>Recover the current vineyard cluster on kubernetes. You could
+recover all objects from a backup of vineyard cluster. Usually,
+the recover job should be created in the same namespace of
+the backup job.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">create</span> <span class="n">recover</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-create"><span class="xref myst">vineyardctl create</span></a>	 - Create a vineyard jobs on kubernetes</p></li>
+</ul>
+</div>
+<div class="section" id="id9">
+<h3>Examples<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># create a recover job for a backup job in the same namespace</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>create<span class="w"> </span>recover<span class="w"> </span>--backup-name<span class="w"> </span>vineyardd-sample<span class="w"> </span>-n<span class="w"> </span>vineyard-system
+</pre></div>
+</div>
+</div>
+<div class="section" id="id10">
+<h3>Options<a class="headerlink" href="#id10" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>      <span class="o">--</span><span class="n">backup</span><span class="o">-</span><span class="n">name</span> <span class="n">string</span>    <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">backup</span> <span class="n">job</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyard-backup&quot;</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                  <span class="n">help</span> <span class="k">for</span> <span class="n">recover</span>
+      <span class="o">--</span><span class="n">recover</span><span class="o">-</span><span class="n">name</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">recover</span> <span class="n">job</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyard-recover&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-delete">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span></code><a class="headerlink" href="#vineyardctl-delete" title="Permalink to this heading">#</a></h2>
+<p>Delete the vineyard components from kubernetes</p>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal"><span class="doc std std-doc">vineyardctl</span></a>	 - vineyardctl is the command-line tool for interact with the Vineyard Operator.</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-delete-backup"><span class="xref myst">vineyardctl delete backup</span></a>	 - Delete the backup job on kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-delete-cert-manager"><span class="xref myst">vineyardctl delete cert-manager</span></a>	 - Delete the cert-manager on kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-delete-operation"><span class="xref myst">vineyardctl delete operation</span></a>	 - Delete the operation from kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-delete-operator"><span class="xref myst">vineyardctl delete operator</span></a>	 - Delete the vineyard operator from kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-delete-recover"><span class="xref myst">vineyardctl delete recover</span></a>	 - Delete the recover job from kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-delete-vineyard-cluster"><span class="xref myst">vineyardctl delete vineyard-cluster</span></a>	 - Delete the vineyard cluster from kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-delete-vineyard-deployment"><span class="xref myst">vineyardctl delete vineyard-deployment</span></a>	 - delete vineyard-deployment will delete the vineyard deployment without vineyard operator</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-delete-vineyardd"><span class="xref myst">vineyardctl delete vineyardd</span></a>	 - Delete the vineyardd cluster from kubernetes</p></li>
+</ul>
+<div class="section" id="id11">
+<h3>Examples<a class="headerlink" href="#id11" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># delete the default vineyard cluster on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>delete
+
+<span class="w">  </span><span class="c1"># delete the default vineyard operator on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>delete<span class="w"> </span>operator
+
+<span class="w">  </span><span class="c1"># delete the default cert-manager on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>delete<span class="w"> </span>cert-manager
+
+<span class="w">  </span><span class="c1"># delete the default vineyardd on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>delete<span class="w"> </span>vineyardd
+</pre></div>
+</div>
+</div>
+<div class="section" id="id12">
+<h3>Options<a class="headerlink" href="#id12" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>   <span class="n">help</span> <span class="k">for</span> <span class="n">delete</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-delete-backup">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">backup</span></code><a class="headerlink" href="#vineyardctl-delete-backup" title="Permalink to this heading">#</a></h2>
+<p>Delete the backup job on kubernetes</p>
+<div class="section" id="id13">
+<h3>Synopsis<a class="headerlink" href="#id13" title="Permalink to this heading">#</a></h3>
+<p>Delete the backup job on kubernetes.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">delete</span> <span class="n">backup</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-delete"><span class="xref myst">vineyardctl delete</span></a>	 - Delete the vineyard components from kubernetes</p></li>
+</ul>
+</div>
+<div class="section" id="id14">
+<h3>Examples<a class="headerlink" href="#id14" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># delete the default backup job</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>delete<span class="w"> </span>backup
+</pre></div>
+</div>
+</div>
+<div class="section" id="id15">
+<h3>Options<a class="headerlink" href="#id15" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>      <span class="o">--</span><span class="n">backup</span><span class="o">-</span><span class="n">name</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">backup</span> <span class="n">job</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyard-backup&quot;</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                 <span class="n">help</span> <span class="k">for</span> <span class="n">backup</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-delete-cert-manager">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">cert-manager</span></code><a class="headerlink" href="#vineyardctl-delete-cert-manager" title="Permalink to this heading">#</a></h2>
+<p>Delete the cert-manager on kubernetes</p>
+<div class="section" id="id16">
+<h3>Synopsis<a class="headerlink" href="#id16" title="Permalink to this heading">#</a></h3>
+<p>Delete the cert-manager in the cert-manager namespace.
+The default version of cert-manager is v1.9.1.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">delete</span> <span class="n">cert</span><span class="o">-</span><span class="n">manager</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-delete"><span class="xref myst">vineyardctl delete</span></a>	 - Delete the vineyard components from kubernetes</p></li>
+</ul>
+</div>
+<div class="section" id="id17">
+<h3>Examples<a class="headerlink" href="#id17" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># delete the default version(v1.9.1) of cert-manager</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>delete<span class="w"> </span>cert-manager
+</pre></div>
+</div>
+</div>
+<div class="section" id="id18">
+<h3>Options<a class="headerlink" href="#id18" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>   <span class="n">help</span> <span class="k">for</span> <span class="n">cert</span><span class="o">-</span><span class="n">manager</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-delete-operation">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">operation</span></code><a class="headerlink" href="#vineyardctl-delete-operation" title="Permalink to this heading">#</a></h2>
+<p>Delete the operation from kubernetes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">delete</span> <span class="n">operation</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-delete"><span class="xref myst">vineyardctl delete</span></a>	 - Delete the vineyard components from kubernetes</p></li>
+</ul>
+<div class="section" id="id19">
+<h3>Examples<a class="headerlink" href="#id19" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># delete the operation named &quot;assembly-test&quot; in the &quot;vineyard-system&quot; namespace</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>delete<span class="w"> </span>operation<span class="w"> </span>--name<span class="w"> </span>assembly-test
+</pre></div>
+</div>
+</div>
+<div class="section" id="id20">
+<h3>Options<a class="headerlink" href="#id20" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>          <span class="n">help</span> <span class="k">for</span> <span class="n">operation</span>
+      <span class="o">--</span><span class="n">name</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">operation</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-delete-operator">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">operator</span></code><a class="headerlink" href="#vineyardctl-delete-operator" title="Permalink to this heading">#</a></h2>
+<p>Delete the vineyard operator from kubernetes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">delete</span> <span class="n">operator</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-delete"><span class="xref myst">vineyardctl delete</span></a>	 - Delete the vineyard components from kubernetes</p></li>
+</ul>
+<div class="section" id="id21">
+<h3>Examples<a class="headerlink" href="#id21" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># delete the default vineyard operator in the vineyard-system namespace</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>delete<span class="w"> </span>operator
+
+<span class="w">  </span><span class="c1"># delete the specific version of vineyard operator in the vineyard-system namespace</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>delete<span class="w"> </span>operator<span class="w"> </span>-v<span class="w"> </span><span class="m">0</span>.12.2
+
+<span class="w">  </span><span class="c1"># delete the vineyard operator from local kustomize dir in the vineyard-system namespace</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>delete<span class="w"> </span>operator<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--local<span class="w"> </span>../config/default
+</pre></div>
+</div>
+</div>
+<div class="section" id="id22">
+<h3>Options<a class="headerlink" href="#id22" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>             <span class="n">help</span> <span class="k">for</span> <span class="n">operator</span>
+  <span class="o">-</span><span class="n">l</span><span class="p">,</span> <span class="o">--</span><span class="n">local</span> <span class="n">string</span>     <span class="n">the</span> <span class="n">local</span> <span class="n">kustomize</span> <span class="nb">dir</span>
+  <span class="o">-</span><span class="n">v</span><span class="p">,</span> <span class="o">--</span><span class="n">version</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">version</span> <span class="n">of</span> <span class="n">kustomize</span> <span class="nb">dir</span> <span class="kn">from</span> <span class="nn">github</span> <span class="n">repo</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;dev&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-delete-recover">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">recover</span></code><a class="headerlink" href="#vineyardctl-delete-recover" title="Permalink to this heading">#</a></h2>
+<p>Delete the recover job from kubernetes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">delete</span> <span class="n">recover</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-delete"><span class="xref myst">vineyardctl delete</span></a>	 - Delete the vineyard components from kubernetes</p></li>
+</ul>
+<div class="section" id="id23">
+<h3>Examples<a class="headerlink" href="#id23" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># delete the default recover job on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>delete<span class="w"> </span>recover
+</pre></div>
+</div>
+</div>
+<div class="section" id="id24">
+<h3>Options<a class="headerlink" href="#id24" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>   <span class="n">help</span> <span class="k">for</span> <span class="n">recover</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-delete-vineyard-cluster">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">vineyard-cluster</span></code><a class="headerlink" href="#vineyardctl-delete-vineyard-cluster" title="Permalink to this heading">#</a></h2>
+<p>Delete the vineyard cluster from kubernetes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">delete</span> <span class="n">vineyard</span><span class="o">-</span><span class="n">cluster</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-delete"><span class="xref myst">vineyardctl delete</span></a>	 - Delete the vineyard components from kubernetes</p></li>
+</ul>
+<div class="section" id="id25">
+<h3>Examples<a class="headerlink" href="#id25" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># delete the default vineyard cluster on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>delete<span class="w"> </span>vineyard-cluster
+</pre></div>
+</div>
+</div>
+<div class="section" id="id26">
+<h3>Options<a class="headerlink" href="#id26" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>   <span class="n">help</span> <span class="k">for</span> <span class="n">vineyard</span><span class="o">-</span><span class="n">cluster</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-delete-vineyard-deployment">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">vineyard-deployment</span></code><a class="headerlink" href="#vineyardctl-delete-vineyard-deployment" title="Permalink to this heading">#</a></h2>
+<p>delete vineyard-deployment will delete the vineyard deployment without vineyard operator</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">delete</span> <span class="n">vineyard</span><span class="o">-</span><span class="n">deployment</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-delete"><span class="xref myst">vineyardctl delete</span></a>	 - Delete the vineyard components from kubernetes</p></li>
+</ul>
+<div class="section" id="id27">
+<h3>Examples<a class="headerlink" href="#id27" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># delete the default vineyard deployment in the vineyard-system namespace</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>delete<span class="w"> </span>vineyard-deployment
+
+<span class="w">  </span><span class="c1"># delete the vineyard deployment with specific name in the vineyard-system namespace</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>delete<span class="w"> </span>vineyard-deployment<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--name<span class="w"> </span>vineyardd-0
+</pre></div>
+</div>
+</div>
+<div class="section" id="id28">
+<h3>Options<a class="headerlink" href="#id28" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>          <span class="n">help</span> <span class="k">for</span> <span class="n">vineyard</span><span class="o">-</span><span class="n">deployment</span>
+      <span class="o">--</span><span class="n">name</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyardd-sample&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-delete-vineyardd">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">vineyardd</span></code><a class="headerlink" href="#vineyardctl-delete-vineyardd" title="Permalink to this heading">#</a></h2>
+<p>Delete the vineyardd cluster from kubernetes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">delete</span> <span class="n">vineyardd</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-delete"><span class="xref myst">vineyardctl delete</span></a>	 - Delete the vineyard components from kubernetes</p></li>
+</ul>
+<div class="section" id="id29">
+<h3>Examples<a class="headerlink" href="#id29" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># delete the default vineyardd cluster(vineyardd-sample) in the default namespace</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>delete<span class="w"> </span>vineyardd
+
+<span class="w">  </span><span class="c1"># delete the specific vineyardd cluster in the vineyard-system namespace</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>delete<span class="w"> </span>vineyardd<span class="w"> </span>--name<span class="w"> </span>vineyardd-test
+</pre></div>
+</div>
+</div>
+<div class="section" id="id30">
+<h3>Options<a class="headerlink" href="#id30" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>          <span class="n">help</span> <span class="k">for</span> <span class="n">vineyardd</span>
+      <span class="o">--</span><span class="n">name</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyardd-sample&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-deploy">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">deploy</span></code><a class="headerlink" href="#vineyardctl-deploy" title="Permalink to this heading">#</a></h2>
+<p>Deploy the vineyard components on kubernetes</p>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal"><span class="doc std std-doc">vineyardctl</span></a>	 - vineyardctl is the command-line tool for interact with the Vineyard Operator.</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-deploy-cert-manager"><span class="xref myst">vineyardctl deploy cert-manager</span></a>	 - Deploy the cert-manager on kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-deploy-operator"><span class="xref myst">vineyardctl deploy operator</span></a>	 - Deploy the vineyard operator on kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-deploy-vineyard-cluster"><span class="xref myst">vineyardctl deploy vineyard-cluster</span></a>	 - Deploy the vineyard cluster from kubernetes</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-deploy-vineyard-deployment"><span class="xref myst">vineyardctl deploy vineyard-deployment</span></a>	 - DeployVineyardDeployment builds and deploy the yaml file of vineyardd without vineyard operator</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-deploy-vineyardd"><span class="xref myst">vineyardctl deploy vineyardd</span></a>	 - Deploy the vineyardd on kubernetes</p></li>
+</ul>
+<div class="section" id="id31">
+<h3>Examples<a class="headerlink" href="#id31" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># deploy the default vineyard cluster on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>vineyard-cluster
+
+<span class="w">  </span><span class="c1"># deploy the vineyard operator on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>operator
+
+<span class="w">  </span><span class="c1"># deploy the cert-manager on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>cert-manager
+
+<span class="w">  </span><span class="c1"># deploy the vineyardd on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>vineyardd
+</pre></div>
+</div>
+</div>
+<div class="section" id="id32">
+<h3>Options<a class="headerlink" href="#id32" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>   <span class="n">help</span> <span class="k">for</span> <span class="n">deploy</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-deploy-cert-manager">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">deploy</span> <span class="pre">cert-manager</span></code><a class="headerlink" href="#vineyardctl-deploy-cert-manager" title="Permalink to this heading">#</a></h2>
+<p>Deploy the cert-manager on kubernetes</p>
+<div class="section" id="id33">
+<h3>Synopsis<a class="headerlink" href="#id33" title="Permalink to this heading">#</a></h3>
+<p>Deploy the cert-manager in the cert-manager namespace. The default
+version of cert-manager is v1.9.1.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">deploy</span> <span class="n">cert</span><span class="o">-</span><span class="n">manager</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-deploy"><span class="xref myst">vineyardctl deploy</span></a>	 - Deploy the vineyard components on kubernetes</p></li>
+</ul>
+</div>
+<div class="section" id="id34">
+<h3>Examples<a class="headerlink" href="#id34" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># install the default version(v1.9.1) in the cert-manager namespace</span>
+<span class="w">  </span><span class="c1"># wait for the cert-manager to be ready(default option)</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>cert-manager
+
+<span class="w">  </span><span class="c1"># install the default version(v1.9.1) in the cert-manager namespace</span>
+<span class="w">  </span><span class="c1"># not to wait for the cert-manager to be ready, but we does not recommend</span>
+<span class="w">  </span><span class="c1"># to do this, because there may be errors caused by the cert-manager</span>
+<span class="w">  </span><span class="c1"># not ready</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>cert-manager<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--wait<span class="o">=</span><span class="nb">false</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id35">
+<h3>Options<a class="headerlink" href="#id35" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>   <span class="n">help</span> <span class="k">for</span> <span class="n">cert</span><span class="o">-</span><span class="n">manager</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-deploy-operator">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">deploy</span> <span class="pre">operator</span></code><a class="headerlink" href="#vineyardctl-deploy-operator" title="Permalink to this heading">#</a></h2>
+<p>Deploy the vineyard operator on kubernetes</p>
+<div class="section" id="id36">
+<h3>Synopsis<a class="headerlink" href="#id36" title="Permalink to this heading">#</a></h3>
+<p>Deploy the vineyard operator on kubernetes. You could specify a
+stable or development version of the operator. The default
+kustomize dir is development version from github repo. Also, you
+can install the stable version from github repo or a local
+kustomize dir. Besides, you can also  deploy the vineyard
+operator in an existing namespace.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">deploy</span> <span class="n">operator</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-deploy"><span class="xref myst">vineyardctl deploy</span></a>	 - Deploy the vineyard components on kubernetes</p></li>
+</ul>
+</div>
+<div class="section" id="id37">
+<h3>Examples<a class="headerlink" href="#id37" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># install the development version in the vineyard-system namespace</span>
+<span class="w">  </span><span class="c1"># the default kustomize dir is the development version from github repo</span>
+<span class="w">  </span><span class="c1"># (https://github.com/v6d-io/v6d/k8s/config/default\?submodules=false)</span>
+<span class="w">  </span><span class="c1"># and the default namespace is vineyard-system</span>
+<span class="w">  </span><span class="c1"># wait for the vineyard operator to be ready(default option)</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>deploy<span class="w"> </span>operator
+
+<span class="w">  </span><span class="c1"># not to wait for the vineyard operator to be ready</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>deploy<span class="w"> </span>operator<span class="w"> </span>--wait<span class="o">=</span><span class="nb">false</span>
+
+<span class="w">  </span><span class="c1"># install the stable version from github repo in the test namespace</span>
+<span class="w">  </span><span class="c1"># the kustomize dir is</span>
+<span class="w">  </span><span class="c1"># (https://github.com/v6d-io/v6d/k8s/config/default\?submodules=false&amp;ref=v0.12.2)</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>operator<span class="w"> </span>-v<span class="w"> </span><span class="m">0</span>.12.2
+
+<span class="w">  </span><span class="c1"># install the local kustomize dir</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>operator<span class="w"> </span>--local<span class="w"> </span>../config/default
+</pre></div>
+</div>
+</div>
+<div class="section" id="id38">
+<h3>Options<a class="headerlink" href="#id38" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>             <span class="n">help</span> <span class="k">for</span> <span class="n">operator</span>
+  <span class="o">-</span><span class="n">l</span><span class="p">,</span> <span class="o">--</span><span class="n">local</span> <span class="n">string</span>     <span class="n">the</span> <span class="n">local</span> <span class="n">kustomize</span> <span class="nb">dir</span>
+  <span class="o">-</span><span class="n">v</span><span class="p">,</span> <span class="o">--</span><span class="n">version</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">version</span> <span class="n">of</span> <span class="n">kustomize</span> <span class="nb">dir</span> <span class="kn">from</span> <span class="nn">github</span> <span class="n">repo</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;dev&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-deploy-vineyard-cluster">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">deploy</span> <span class="pre">vineyard-cluster</span></code><a class="headerlink" href="#vineyardctl-deploy-vineyard-cluster" title="Permalink to this heading">#</a></h2>
+<p>Deploy the vineyard cluster from kubernetes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">deploy</span> <span class="n">vineyard</span><span class="o">-</span><span class="n">cluster</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-deploy"><span class="xref myst">vineyardctl deploy</span></a>	 - Deploy the vineyard components on kubernetes</p></li>
+</ul>
+<div class="section" id="id39">
+<h3>Examples<a class="headerlink" href="#id39" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># deploy the default vineyard cluster on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>deploy<span class="w"> </span>vineyard-cluster
+</pre></div>
+</div>
+</div>
+<div class="section" id="id40">
+<h3>Options<a class="headerlink" href="#id40" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>   <span class="n">help</span> <span class="k">for</span> <span class="n">vineyard</span><span class="o">-</span><span class="n">cluster</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-deploy-vineyard-deployment">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">deploy</span> <span class="pre">vineyard-deployment</span></code><a class="headerlink" href="#vineyardctl-deploy-vineyard-deployment" title="Permalink to this heading">#</a></h2>
+<p>DeployVineyardDeployment builds and deploy the yaml file of vineyardd without vineyard operator</p>
+<div class="section" id="id41">
+<h3>Synopsis<a class="headerlink" href="#id41" title="Permalink to this heading">#</a></h3>
+<p>Builds and deploy the yaml file of vineyardd the vineyardd
+without vineyard operator. You could deploy a customized
+vineyardd from stdin or file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">deploy</span> <span class="n">vineyard</span><span class="o">-</span><span class="n">deployment</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-deploy"><span class="xref myst">vineyardctl deploy</span></a>	 - Deploy the vineyard components on kubernetes</p></li>
+</ul>
+</div>
+<div class="section" id="id42">
+<h3>Examples<a class="headerlink" href="#id42" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># deploy the default vineyard deployment on kubernetes</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>deploy<span class="w"> </span>vineyard-deployment
+
+<span class="w">  </span><span class="c1"># deploy the vineyard deployment with customized image</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>deploy<span class="w"> </span>vineyard-deployment<span class="w"> </span>--image<span class="w"> </span>vineyardd:v0.12.2
+</pre></div>
+</div>
+</div>
+<div class="section" id="id43">
+<h3>Options<a class="headerlink" href="#id43" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">f</span><span class="p">,</span> <span class="o">--</span><span class="n">file</span> <span class="n">string</span>                               <span class="n">the</span> <span class="n">path</span> <span class="n">of</span> <span class="n">vineyardd</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                                      <span class="n">help</span> <span class="k">for</span> <span class="n">vineyard</span><span class="o">-</span><span class="n">deployment</span>
+  <span class="o">-</span><span class="n">l</span><span class="p">,</span> <span class="o">--</span><span class="n">label</span> <span class="n">string</span>                              <span class="n">label</span> <span class="n">of</span> <span class="n">the</span> <span class="n">vineyardd</span>
+      <span class="o">--</span><span class="n">name</span> <span class="n">string</span>                               <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyardd-sample&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">plugin</span><span class="o">.</span><span class="n">backupImage</span> <span class="n">string</span>                 <span class="n">the</span> <span class="n">backup</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ghcr.io/v6d-io/v6d/backup-job&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">plugin</span><span class="o">.</span><span class="n">daskRepartitionImage</span> <span class="n">string</span>        <span class="n">the</span> <span class="n">dask</span> <span class="n">repartition</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="n">workflow</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ghcr.io/v6d-io/v6d/dask-repartition&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">plugin</span><span class="o">.</span><span class="n">distributedAssemblyImage</span> <span class="n">string</span>    <span class="n">the</span> <span class="n">distributed</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">workflow</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ghcr.io/v6d-io/v6d/distributed-assembly&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">plugin</span><span class="o">.</span><span class="n">localAssemblyImage</span> <span class="n">string</span>          <span class="n">the</span> <span class="n">local</span> <span class="n">assembly</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="n">workflow</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ghcr.io/v6d-io/v6d/local-assembly&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">plugin</span><span class="o">.</span><span class="n">recoverImage</span> <span class="n">string</span>                <span class="n">the</span> <span class="n">recover</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ghcr.io/v6d-io/v6d/recover-job&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyard</span><span class="o">.</span><span class="n">etcd</span><span class="o">.</span><span class="n">replicas</span> <span class="nb">int</span>                <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">etcd</span> <span class="n">replicas</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">vineyard</span> <span class="n">cluster</span> <span class="p">(</span><span class="n">default</span> <span class="mi">3</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyard</span><span class="o">.</span><span class="n">replicas</span> <span class="nb">int</span>                     <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="n">replicas</span> <span class="p">(</span><span class="n">default</span> <span class="mi">3</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">envs</span> <span class="n">strings</span>                    <span class="n">The</span> <span class="n">environment</span> <span class="n">variables</span> <span class="n">of</span> <span class="n">vineyardd</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">etcdEndpoint</span> <span class="n">string</span>             <span class="n">The</span> <span class="n">etcd</span> <span class="n">endpoint</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;http://etcd-for-vineyard:2379&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">etcdPrefix</span> <span class="n">string</span>               <span class="n">The</span> <span class="n">etcd</span> <span class="n">prefix</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;/vineyard&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">image</span> <span class="n">string</span>                    <span class="n">the</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyardcloudnative/vineyardd:latest&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">imagePullPolicy</span> <span class="n">string</span>          <span class="n">the</span> <span class="n">imagePullPolicy</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;IfNotPresent&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">enable</span>                   <span class="n">enable</span> <span class="n">metrics</span> <span class="n">of</span> <span class="n">vineyardd</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">image</span> <span class="n">string</span>             <span class="n">the</span> <span class="n">metic</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyardcloudnative/vineyard-grok-exporter:latest&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">imagePullPolicy</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">imagePullPolicy</span> <span class="n">of</span> <span class="n">the</span> <span class="n">metric</span> <span class="n">image</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;IfNotPresent&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">port</span> <span class="nb">int</span>                <span class="n">the</span> <span class="n">service</span> <span class="n">port</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">service</span> <span class="p">(</span><span class="n">default</span> <span class="mi">9600</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">selector</span> <span class="n">string</span>         <span class="n">the</span> <span class="n">service</span> <span class="n">selector</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">service</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;rpc.vineyardd.v6d.io/rpc=vineyard-rpc&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">type</span> <span class="n">string</span>             <span class="n">the</span> <span class="n">service</span> <span class="nb">type</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">service</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ClusterIP&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">size</span> <span class="n">string</span>                     <span class="n">The</span> <span class="n">size</span> <span class="n">of</span> <span class="n">vineyardd</span><span class="o">.</span> <span class="n">You</span> <span class="n">can</span> <span class="n">use</span> <span class="n">the</span> <span class="n">power</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">two</span> <span class="n">equivalents</span><span class="p">:</span> <span class="n">Ei</span><span class="p">,</span> <span class="n">Pi</span><span class="p">,</span> <span class="n">Ti</span><span class="p">,</span> <span class="n">Gi</span><span class="p">,</span> <span class="n">Mi</span><span class="p">,</span> <span class="n">Ki</span><span class="o">.</span>  <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;256Mi&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">socket</span> <span class="n">string</span>                   <span class="n">The</span> <span class="n">directory</span> <span class="n">on</span> <span class="n">host</span> <span class="k">for</span> <span class="n">the</span> <span class="n">IPC</span> <span class="n">socket</span> <span class="n">file</span><span class="o">.</span> <span class="n">The</span> <span class="n">namespace</span> <span class="ow">and</span> <span class="n">name</span> <span class="n">will</span> <span class="n">be</span> <span class="n">replaced</span> <span class="k">with</span> <span class="n">your</span> <span class="n">vineyard</span> <span class="n">config</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;/var/run/vineyard-kubernetes/{{.Namespace}}/{{.Name}}&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">config</span> <span class="n">string</span>             <span class="n">If</span> <span class="n">you</span> <span class="n">want</span> <span class="n">to</span> <span class="n">enable</span> <span class="n">the</span> <span class="n">spill</span> <span class="n">mechanism</span><span class="p">,</span> <span class="n">please</span> <span class="nb">set</span> <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">spill</span> <span class="n">config</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">path</span> <span class="n">string</span>               <span class="n">The</span> <span class="n">path</span> <span class="n">of</span> <span class="n">spill</span> <span class="n">config</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">pv</span><span class="o">-</span><span class="n">pvc</span><span class="o">-</span><span class="n">spec</span> <span class="n">string</span>        <span class="n">the</span> <span class="n">json</span> <span class="n">string</span> <span class="n">of</span> <span class="n">the</span> <span class="n">persistent</span> <span class="n">volume</span> <span class="ow">and</span> <span class="n">persistent</span> <span class="n">volume</span> <span class="n">claim</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">spillLowerRate</span> <span class="n">string</span>     <span class="n">The</span> <span class="n">low</span> <span class="n">watermark</span> <span class="n">of</span> <span class="n">spilling</span> <span class="n">memory</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;0.3&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">spillUpperRate</span> <span class="n">string</span>     <span class="n">The</span> <span class="n">high</span> <span class="n">watermark</span> <span class="n">of</span> <span class="n">spilling</span> <span class="n">memory</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;0.8&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">streamThreshold</span> <span class="nb">int</span>             <span class="n">memory</span> <span class="n">threshold</span> <span class="n">of</span> <span class="n">streams</span> <span class="p">(</span><span class="n">percentage</span> <span class="n">of</span> <span class="n">total</span> <span class="n">memory</span><span class="p">)</span> <span class="p">(</span><span class="n">default</span> <span class="mi">80</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">syncCRDs</span>                        <span class="n">enable</span> <span class="n">metrics</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="n">true</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">mountPath</span> <span class="n">string</span>         <span class="n">Set</span> <span class="n">the</span> <span class="n">mount</span> <span class="n">path</span> <span class="k">for</span> <span class="n">the</span> <span class="n">pvc</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">pvcname</span> <span class="n">string</span>           <span class="n">Set</span> <span class="n">the</span> <span class="n">pvc</span> <span class="n">name</span> <span class="k">for</span> <span class="n">storing</span> <span class="n">the</span> <span class="n">vineyard</span> <span class="n">objects</span> <span class="n">persistently</span><span class="p">,</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-deploy-vineyardd">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">deploy</span> <span class="pre">vineyardd</span></code><a class="headerlink" href="#vineyardctl-deploy-vineyardd" title="Permalink to this heading">#</a></h2>
+<p>Deploy the vineyardd on kubernetes</p>
+<div class="section" id="id44">
+<h3>Synopsis<a class="headerlink" href="#id44" title="Permalink to this heading">#</a></h3>
+<p>Deploy the vineyardd on kubernetes. You could deploy a
+customized vineyardd from stdin or file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">deploy</span> <span class="n">vineyardd</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-deploy"><span class="xref myst">vineyardctl deploy</span></a>	 - Deploy the vineyard components on kubernetes</p></li>
+</ul>
+</div>
+<div class="section" id="id45">
+<h3>Examples<a class="headerlink" href="#id45" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># deploy the default vineyard on kubernetes</span>
+<span class="w">  </span><span class="c1"># wait for the vineyardd to be ready(default option)</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>vineyardd
+
+<span class="w">  </span><span class="c1"># not to wait for the vineyardd to be ready</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>vineyardd<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--wait<span class="o">=</span><span class="nb">false</span>
+
+<span class="w">  </span><span class="c1"># deploy the vineyardd from a yaml file</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>vineyardd<span class="w"> </span>--file<span class="w"> </span>vineyardd.yaml
+
+<span class="w">  </span><span class="c1"># deploy the vineyardd with customized image</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>vineyardd<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--image<span class="w"> </span>vineyardd:v0.12.2
+
+<span class="w">  </span><span class="c1"># deploy the vineyardd with spill mechanism on persistent storage from json string</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>vineyardd<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd.spill.config<span class="w"> </span>spill-path<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd.spill.path<span class="w"> </span>/var/vineyard/spill<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd.spill.pv-pvc-spec<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">      &quot;pv-spec&quot;: {</span>
+<span class="s1">        &quot;capacity&quot;: {</span>
+<span class="s1">          &quot;storage&quot;: &quot;1Gi&quot;</span>
+<span class="s1">        },</span>
+<span class="s1">        &quot;accessModes&quot;: [</span>
+<span class="s1">          &quot;ReadWriteOnce&quot;</span>
+<span class="s1">        ],</span>
+<span class="s1">        &quot;storageClassName&quot;: &quot;manual&quot;,</span>
+<span class="s1">        &quot;hostPath&quot;: {</span>
+<span class="s1">          &quot;path&quot;: &quot;/var/vineyard/spill&quot;</span>
+<span class="s1">        }</span>
+<span class="s1">      },</span>
+<span class="s1">      &quot;pvc-spec&quot;: {</span>
+<span class="s1">        &quot;storageClassName&quot;: &quot;manual&quot;,</span>
+<span class="s1">        &quot;accessModes&quot;: [</span>
+<span class="s1">          &quot;ReadWriteOnce&quot;</span>
+<span class="s1">        ],</span>
+<span class="s1">        &quot;resources&quot;: {</span>
+<span class="s1">          &quot;requests&quot;: {</span>
+<span class="s1">          &quot;storage&quot;: &quot;512Mi&quot;</span>
+<span class="s1">          }</span>
+<span class="s1">        }</span>
+<span class="s1">      }</span>
+<span class="s1">    }&#39;</span>
+
+<span class="w">  </span><span class="c1"># deploy the vineyardd with spill mechanism on persistent storage from yaml string</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>vineyardd<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd.spill.config<span class="w"> </span>spill-path<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd.spill.path<span class="w"> </span>/var/vineyard/spill<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd.spill.pv-pvc-spec<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="s1">&#39;</span>
+<span class="s1">    pv-spec:</span>
+<span class="s1">      capacity:</span>
+<span class="s1">      storage: 1Gi</span>
+<span class="s1">      accessModes:</span>
+<span class="s1">      - ReadWriteOnce</span>
+<span class="s1">      storageClassName: manual</span>
+<span class="s1">      hostPath:</span>
+<span class="s1">      path: &quot;/var/vineyard/spill&quot;</span>
+<span class="s1">    pvc-spec:</span>
+<span class="s1">      storageClassName: manual</span>
+<span class="s1">      accessModes:</span>
+<span class="s1">      - ReadWriteOnce</span>
+<span class="s1">      resources:</span>
+<span class="s1">      requests:</span>
+<span class="s1">        storage: 512Mi</span>
+<span class="s1">    &#39;</span>
+
+<span class="c1"># deploy the vineyardd with spill mechanism on persistent storage from json file</span>
+<span class="w">  </span><span class="c1"># also you could use the yaml file</span>
+<span class="w">  </span>cat<span class="w"> </span>pv-pvc.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>vineyardctl<span class="w"> </span>-n<span class="w"> </span>vineyard-system<span class="w"> </span>--kubeconfig<span class="w"> </span><span class="nv">$HOME</span>/.kube/config<span class="w"> </span>deploy<span class="w"> </span>vineyardd<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd.spill.config<span class="w"> </span>spill-path<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd.spill.path<span class="w"> </span>/var/vineyard/spill<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-
+</pre></div>
+</div>
+</div>
+<div class="section" id="id46">
+<h3>Options<a class="headerlink" href="#id46" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">f</span><span class="p">,</span> <span class="o">--</span><span class="n">file</span> <span class="n">string</span>                               <span class="n">the</span> <span class="n">path</span> <span class="n">of</span> <span class="n">vineyardd</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                                      <span class="n">help</span> <span class="k">for</span> <span class="n">vineyardd</span>
+      <span class="o">--</span><span class="n">name</span> <span class="n">string</span>                               <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyardd-sample&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">plugin</span><span class="o">.</span><span class="n">backupImage</span> <span class="n">string</span>                 <span class="n">the</span> <span class="n">backup</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ghcr.io/v6d-io/v6d/backup-job&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">plugin</span><span class="o">.</span><span class="n">daskRepartitionImage</span> <span class="n">string</span>        <span class="n">the</span> <span class="n">dask</span> <span class="n">repartition</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="n">workflow</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ghcr.io/v6d-io/v6d/dask-repartition&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">plugin</span><span class="o">.</span><span class="n">distributedAssemblyImage</span> <span class="n">string</span>    <span class="n">the</span> <span class="n">distributed</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">workflow</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ghcr.io/v6d-io/v6d/distributed-assembly&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">plugin</span><span class="o">.</span><span class="n">localAssemblyImage</span> <span class="n">string</span>          <span class="n">the</span> <span class="n">local</span> <span class="n">assembly</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="n">workflow</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ghcr.io/v6d-io/v6d/local-assembly&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">plugin</span><span class="o">.</span><span class="n">recoverImage</span> <span class="n">string</span>                <span class="n">the</span> <span class="n">recover</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ghcr.io/v6d-io/v6d/recover-job&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyard</span><span class="o">.</span><span class="n">etcd</span><span class="o">.</span><span class="n">replicas</span> <span class="nb">int</span>                <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">etcd</span> <span class="n">replicas</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">vineyard</span> <span class="n">cluster</span> <span class="p">(</span><span class="n">default</span> <span class="mi">3</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyard</span><span class="o">.</span><span class="n">replicas</span> <span class="nb">int</span>                     <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="n">replicas</span> <span class="p">(</span><span class="n">default</span> <span class="mi">3</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">envs</span> <span class="n">strings</span>                    <span class="n">The</span> <span class="n">environment</span> <span class="n">variables</span> <span class="n">of</span> <span class="n">vineyardd</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">etcdEndpoint</span> <span class="n">string</span>             <span class="n">The</span> <span class="n">etcd</span> <span class="n">endpoint</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;http://etcd-for-vineyard:2379&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">etcdPrefix</span> <span class="n">string</span>               <span class="n">The</span> <span class="n">etcd</span> <span class="n">prefix</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;/vineyard&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">image</span> <span class="n">string</span>                    <span class="n">the</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyardcloudnative/vineyardd:latest&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">imagePullPolicy</span> <span class="n">string</span>          <span class="n">the</span> <span class="n">imagePullPolicy</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;IfNotPresent&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">enable</span>                   <span class="n">enable</span> <span class="n">metrics</span> <span class="n">of</span> <span class="n">vineyardd</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">image</span> <span class="n">string</span>             <span class="n">the</span> <span class="n">metic</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyardcloudnative/vineyard-grok-exporter:latest&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">imagePullPolicy</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">imagePullPolicy</span> <span class="n">of</span> <span class="n">the</span> <span class="n">metric</span> <span class="n">image</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;IfNotPresent&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">port</span> <span class="nb">int</span>                <span class="n">the</span> <span class="n">service</span> <span class="n">port</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">service</span> <span class="p">(</span><span class="n">default</span> <span class="mi">9600</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">selector</span> <span class="n">string</span>         <span class="n">the</span> <span class="n">service</span> <span class="n">selector</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">service</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;rpc.vineyardd.v6d.io/rpc=vineyard-rpc&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">type</span> <span class="n">string</span>             <span class="n">the</span> <span class="n">service</span> <span class="nb">type</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">service</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ClusterIP&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">size</span> <span class="n">string</span>                     <span class="n">The</span> <span class="n">size</span> <span class="n">of</span> <span class="n">vineyardd</span><span class="o">.</span> <span class="n">You</span> <span class="n">can</span> <span class="n">use</span> <span class="n">the</span> <span class="n">power</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">two</span> <span class="n">equivalents</span><span class="p">:</span> <span class="n">Ei</span><span class="p">,</span> <span class="n">Pi</span><span class="p">,</span> <span class="n">Ti</span><span class="p">,</span> <span class="n">Gi</span><span class="p">,</span> <span class="n">Mi</span><span class="p">,</span> <span class="n">Ki</span><span class="o">.</span>  <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;256Mi&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">socket</span> <span class="n">string</span>                   <span class="n">The</span> <span class="n">directory</span> <span class="n">on</span> <span class="n">host</span> <span class="k">for</span> <span class="n">the</span> <span class="n">IPC</span> <span class="n">socket</span> <span class="n">file</span><span class="o">.</span> <span class="n">The</span> <span class="n">namespace</span> <span class="ow">and</span> <span class="n">name</span> <span class="n">will</span> <span class="n">be</span> <span class="n">replaced</span> <span class="k">with</span> <span class="n">your</span> <span class="n">vineyard</span> <span class="n">config</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;/var/run/vineyard-kubernetes/{{.Namespace}}/{{.Name}}&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">config</span> <span class="n">string</span>             <span class="n">If</span> <span class="n">you</span> <span class="n">want</span> <span class="n">to</span> <span class="n">enable</span> <span class="n">the</span> <span class="n">spill</span> <span class="n">mechanism</span><span class="p">,</span> <span class="n">please</span> <span class="nb">set</span> <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">spill</span> <span class="n">config</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">path</span> <span class="n">string</span>               <span class="n">The</span> <span class="n">path</span> <span class="n">of</span> <span class="n">spill</span> <span class="n">config</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">pv</span><span class="o">-</span><span class="n">pvc</span><span class="o">-</span><span class="n">spec</span> <span class="n">string</span>        <span class="n">the</span> <span class="n">json</span> <span class="n">string</span> <span class="n">of</span> <span class="n">the</span> <span class="n">persistent</span> <span class="n">volume</span> <span class="ow">and</span> <span class="n">persistent</span> <span class="n">volume</span> <span class="n">claim</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">spillLowerRate</span> <span class="n">string</span>     <span class="n">The</span> <span class="n">low</span> <span class="n">watermark</span> <span class="n">of</span> <span class="n">spilling</span> <span class="n">memory</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;0.3&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">spillUpperRate</span> <span class="n">string</span>     <span class="n">The</span> <span class="n">high</span> <span class="n">watermark</span> <span class="n">of</span> <span class="n">spilling</span> <span class="n">memory</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;0.8&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">streamThreshold</span> <span class="nb">int</span>             <span class="n">memory</span> <span class="n">threshold</span> <span class="n">of</span> <span class="n">streams</span> <span class="p">(</span><span class="n">percentage</span> <span class="n">of</span> <span class="n">total</span> <span class="n">memory</span><span class="p">)</span> <span class="p">(</span><span class="n">default</span> <span class="mi">80</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">syncCRDs</span>                        <span class="n">enable</span> <span class="n">metrics</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="n">true</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">mountPath</span> <span class="n">string</span>         <span class="n">Set</span> <span class="n">the</span> <span class="n">mount</span> <span class="n">path</span> <span class="k">for</span> <span class="n">the</span> <span class="n">pvc</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">pvcname</span> <span class="n">string</span>           <span class="n">Set</span> <span class="n">the</span> <span class="n">pvc</span> <span class="n">name</span> <span class="k">for</span> <span class="n">storing</span> <span class="n">the</span> <span class="n">vineyard</span> <span class="n">objects</span> <span class="n">persistently</span><span class="p">,</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-inject">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">inject</span></code><a class="headerlink" href="#vineyardctl-inject" title="Permalink to this heading">#</a></h2>
+<p>Inject the vineyard sidecar container into a workload</p>
+<div class="section" id="id47">
+<h3>Synopsis<a class="headerlink" href="#id47" title="Permalink to this heading">#</a></h3>
+<p>Inject the vineyard sidecar container into a workload. You can
+get the injected workload yaml and some etcd yaml from the output.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">inject</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal"><span class="doc std std-doc">vineyardctl</span></a>	 - vineyardctl is the command-line tool for interact with the Vineyard Operator.</p></li>
+</ul>
+</div>
+<div class="section" id="id48">
+<h3>Examples<a class="headerlink" href="#id48" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># inject the default vineyard sidecar container into a workload</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>inject<span class="w"> </span>-f<span class="w"> </span>workload.yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>-
+</pre></div>
+</div>
+</div>
+<div class="section" id="id49">
+<h3>Options<a class="headerlink" href="#id49" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>      <span class="o">--</span><span class="n">etcd</span><span class="o">-</span><span class="n">replicas</span> <span class="nb">int</span>                       <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">etcd</span> <span class="n">replicas</span> <span class="p">(</span><span class="n">default</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">f</span><span class="p">,</span> <span class="o">--</span><span class="n">file</span> <span class="n">string</span>                             <span class="n">The</span> <span class="n">yaml</span> <span class="n">of</span> <span class="n">workload</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                                    <span class="n">help</span> <span class="k">for</span> <span class="n">inject</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">envs</span> <span class="n">strings</span>                    <span class="n">The</span> <span class="n">environment</span> <span class="n">variables</span> <span class="n">of</span> <span class="n">vineyardd</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">etcdEndpoint</span> <span class="n">string</span>             <span class="n">The</span> <span class="n">etcd</span> <span class="n">endpoint</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;http://etcd-for-vineyard:2379&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">etcdPrefix</span> <span class="n">string</span>               <span class="n">The</span> <span class="n">etcd</span> <span class="n">prefix</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;/vineyard&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">image</span> <span class="n">string</span>                    <span class="n">the</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyardcloudnative/vineyardd:latest&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">imagePullPolicy</span> <span class="n">string</span>          <span class="n">the</span> <span class="n">imagePullPolicy</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;IfNotPresent&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">enable</span>                   <span class="n">enable</span> <span class="n">metrics</span> <span class="n">of</span> <span class="n">vineyardd</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">image</span> <span class="n">string</span>             <span class="n">the</span> <span class="n">metic</span> <span class="n">image</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyardcloudnative/vineyard-grok-exporter:latest&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">imagePullPolicy</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">imagePullPolicy</span> <span class="n">of</span> <span class="n">the</span> <span class="n">metric</span> <span class="n">image</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;IfNotPresent&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">port</span> <span class="nb">int</span>                <span class="n">the</span> <span class="n">service</span> <span class="n">port</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">service</span> <span class="p">(</span><span class="n">default</span> <span class="mi">9600</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">selector</span> <span class="n">string</span>         <span class="n">the</span> <span class="n">service</span> <span class="n">selector</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">service</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;rpc.vineyardd.v6d.io/rpc=vineyard-rpc&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">type</span> <span class="n">string</span>             <span class="n">the</span> <span class="n">service</span> <span class="nb">type</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">service</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;ClusterIP&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">size</span> <span class="n">string</span>                     <span class="n">The</span> <span class="n">size</span> <span class="n">of</span> <span class="n">vineyardd</span><span class="o">.</span> <span class="n">You</span> <span class="n">can</span> <span class="n">use</span> <span class="n">the</span> <span class="n">power</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">two</span> <span class="n">equivalents</span><span class="p">:</span> <span class="n">Ei</span><span class="p">,</span> <span class="n">Pi</span><span class="p">,</span> <span class="n">Ti</span><span class="p">,</span> <span class="n">Gi</span><span class="p">,</span> <span class="n">Mi</span><span class="p">,</span> <span class="n">Ki</span><span class="o">.</span>  <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;256Mi&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">socket</span> <span class="n">string</span>                   <span class="n">The</span> <span class="n">directory</span> <span class="n">on</span> <span class="n">host</span> <span class="k">for</span> <span class="n">the</span> <span class="n">IPC</span> <span class="n">socket</span> <span class="n">file</span><span class="o">.</span> <span class="n">The</span> <span class="n">namespace</span> <span class="ow">and</span> <span class="n">name</span> <span class="n">will</span> <span class="n">be</span> <span class="n">replaced</span> <span class="k">with</span> <span class="n">your</span> <span class="n">vineyard</span> <span class="n">config</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;/var/run/vineyard-kubernetes/{{.Namespace}}/{{.Name}}&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">config</span> <span class="n">string</span>             <span class="n">If</span> <span class="n">you</span> <span class="n">want</span> <span class="n">to</span> <span class="n">enable</span> <span class="n">the</span> <span class="n">spill</span> <span class="n">mechanism</span><span class="p">,</span> <span class="n">please</span> <span class="nb">set</span> <span class="n">the</span> <span class="n">name</span> <span class="n">of</span> <span class="n">spill</span> <span class="n">config</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">path</span> <span class="n">string</span>               <span class="n">The</span> <span class="n">path</span> <span class="n">of</span> <span class="n">spill</span> <span class="n">config</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">pv</span><span class="o">-</span><span class="n">pvc</span><span class="o">-</span><span class="n">spec</span> <span class="n">string</span>        <span class="n">the</span> <span class="n">json</span> <span class="n">string</span> <span class="n">of</span> <span class="n">the</span> <span class="n">persistent</span> <span class="n">volume</span> <span class="ow">and</span> <span class="n">persistent</span> <span class="n">volume</span> <span class="n">claim</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">spillLowerRate</span> <span class="n">string</span>     <span class="n">The</span> <span class="n">low</span> <span class="n">watermark</span> <span class="n">of</span> <span class="n">spilling</span> <span class="n">memory</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;0.3&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">spill</span><span class="o">.</span><span class="n">spillUpperRate</span> <span class="n">string</span>     <span class="n">The</span> <span class="n">high</span> <span class="n">watermark</span> <span class="n">of</span> <span class="n">spilling</span> <span class="n">memory</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;0.8&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">streamThreshold</span> <span class="nb">int</span>             <span class="n">memory</span> <span class="n">threshold</span> <span class="n">of</span> <span class="n">streams</span> <span class="p">(</span><span class="n">percentage</span> <span class="n">of</span> <span class="n">total</span> <span class="n">memory</span><span class="p">)</span> <span class="p">(</span><span class="n">default</span> <span class="mi">80</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">syncCRDs</span>                        <span class="n">enable</span> <span class="n">metrics</span> <span class="n">of</span> <span class="n">vineyardd</span> <span class="p">(</span><span class="n">default</span> <span class="n">true</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">mountPath</span> <span class="n">string</span>         <span class="n">Set</span> <span class="n">the</span> <span class="n">mount</span> <span class="n">path</span> <span class="k">for</span> <span class="n">the</span> <span class="n">pvc</span>
+      <span class="o">--</span><span class="n">sidecar</span><span class="o">.</span><span class="n">volume</span><span class="o">.</span><span class="n">pvcname</span> <span class="n">string</span>           <span class="n">Set</span> <span class="n">the</span> <span class="n">pvc</span> <span class="n">name</span> <span class="k">for</span> <span class="n">storing</span> <span class="n">the</span> <span class="n">vineyard</span> <span class="n">objects</span> <span class="n">persistently</span><span class="p">,</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-manager">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">manager</span></code><a class="headerlink" href="#vineyardctl-manager" title="Permalink to this heading">#</a></h2>
+<p>Start the manager of vineyard operator</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">manager</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal"><span class="doc std std-doc">vineyardctl</span></a>	 - vineyardctl is the command-line tool for interact with the Vineyard Operator.</p></li>
+</ul>
+<div class="section" id="id50">
+<h3>Examples<a class="headerlink" href="#id50" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># start the manager of vineyard operator with default configuration</span>
+<span class="w">  </span><span class="c1"># (Enable the controller, webhooks and scheduler)</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>manager
+
+<span class="w">  </span><span class="c1"># start the manager of vineyard operator without webhooks</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>manager<span class="w"> </span>--enable-webhook<span class="o">=</span><span class="nb">false</span>
+
+<span class="w">  </span><span class="c1"># start the manager of vineyard operator without scheduler</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>manager<span class="w"> </span>--enable-scheduler<span class="o">=</span><span class="nb">false</span>
+
+<span class="w">  </span><span class="c1"># only start the controller</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>manager<span class="w"> </span>--enable-webhook<span class="o">=</span><span class="nb">false</span><span class="w"> </span>--enable-scheduler<span class="o">=</span><span class="nb">false</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id51">
+<h3>Options<a class="headerlink" href="#id51" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>      <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">scheduler</span>                   <span class="n">Enable</span> <span class="n">scheduler</span> <span class="k">for</span> <span class="n">controller</span> <span class="n">manager</span><span class="o">.</span> <span class="p">(</span><span class="n">default</span> <span class="n">true</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">webhook</span>                     <span class="n">Enable</span> <span class="n">webhook</span> <span class="k">for</span> <span class="n">controller</span> <span class="n">manager</span><span class="o">.</span> <span class="p">(</span><span class="n">default</span> <span class="n">true</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">health</span><span class="o">-</span><span class="n">probe</span><span class="o">-</span><span class="n">bind</span><span class="o">-</span><span class="n">address</span> <span class="n">string</span>   <span class="n">The</span> <span class="n">address</span> <span class="n">the</span> <span class="n">probe</span> <span class="n">endpoint</span> <span class="n">binds</span> <span class="n">to</span><span class="o">.</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;:8081&quot;</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                               <span class="n">help</span> <span class="k">for</span> <span class="n">manager</span>
+      <span class="o">--</span><span class="n">leader</span><span class="o">-</span><span class="n">elect</span>                       <span class="n">Enable</span> <span class="n">leader</span> <span class="n">election</span> <span class="k">for</span> <span class="n">controller</span> <span class="n">manager</span><span class="o">.</span> <span class="n">Enabling</span> <span class="n">this</span> <span class="n">will</span> <span class="n">ensure</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">only</span> <span class="n">one</span> <span class="n">active</span> <span class="n">controller</span> <span class="n">manager</span><span class="o">.</span>
+      <span class="o">--</span><span class="n">metrics</span><span class="o">-</span><span class="n">bind</span><span class="o">-</span><span class="n">address</span> <span class="n">string</span>        <span class="n">The</span> <span class="n">address</span> <span class="n">the</span> <span class="n">metric</span> <span class="n">endpoint</span> <span class="n">binds</span> <span class="n">to</span><span class="o">.</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;127.0.0.1:8080&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">scheduler</span><span class="o">-</span><span class="n">config</span><span class="o">-</span><span class="n">file</span> <span class="n">string</span>       <span class="n">The</span> <span class="n">location</span> <span class="n">of</span> <span class="n">scheduler</span> <span class="n">plugin</span><span class="s1">&#39;s configuration file. (default &quot;/etc/kubernetes/scheduler.yaml&quot;)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-schedule">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">schedule</span></code><a class="headerlink" href="#vineyardctl-schedule" title="Permalink to this heading">#</a></h2>
+<p>Schedule a workload or a workflow to existing vineyard cluster.</p>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal"><span class="doc std std-doc">vineyardctl</span></a>	 - vineyardctl is the command-line tool for interact with the Vineyard Operator.</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-schedule-workflow"><span class="xref myst">vineyardctl schedule workflow</span></a>	 - Schedule a workflow based on the vineyard cluster</p></li>
+<li><p><a class="reference internal" href="#vineyardctl-schedule-workload"><span class="xref myst">vineyardctl schedule workload</span></a>	 - Schedule the workload to a vineyard cluster</p></li>
+</ul>
+<div class="section" id="id52">
+<h3>Examples<a class="headerlink" href="#id52" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># Schedule a workload to a vineyard cluster</span>
+<span class="w">  </span><span class="c1"># it will add PodAffinity to the workload</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>schedule<span class="w"> </span>workload<span class="w"> </span>--resource<span class="w"> </span><span class="s1">&#39;{kubernetes workload json string}&#39;</span>
+
+<span class="w">  </span><span class="c1"># schedule a workflow to the vineyard cluster</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>schedule<span class="w"> </span>workflow<span class="w"> </span>--file<span class="w"> </span>workflow.yaml
+</pre></div>
+</div>
+</div>
+<div class="section" id="id53">
+<h3>Options<a class="headerlink" href="#id53" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>   <span class="n">help</span> <span class="k">for</span> <span class="n">schedule</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-schedule-workflow">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">schedule</span> <span class="pre">workflow</span></code><a class="headerlink" href="#vineyardctl-schedule-workflow" title="Permalink to this heading">#</a></h2>
+<p>Schedule a workflow based on the vineyard cluster</p>
+<div class="section" id="id54">
+<h3>Synopsis<a class="headerlink" href="#id54" title="Permalink to this heading">#</a></h3>
+<p>Schedule a workflow based on the vineyard cluster.
+It will apply the workflow to kubernetes cluster and deploy the workload
+of the workflow on the vineyard cluster with the best-fit strategy.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">schedule</span> <span class="n">workflow</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-schedule"><span class="xref myst">vineyardctl schedule</span></a>	 - Schedule a workload or a workflow to existing vineyard cluster.</p></li>
+</ul>
+</div>
+<div class="section" id="id55">
+<h3>Examples<a class="headerlink" href="#id55" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># schedule a workflow to the vineyard cluster with the best-fit strategy</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>schedule<span class="w"> </span>workflow<span class="w"> </span>--file<span class="w"> </span>workflow.yaml
+</pre></div>
+</div>
+</div>
+<div class="section" id="id56">
+<h3>Options<a class="headerlink" href="#id56" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">f</span><span class="p">,</span> <span class="o">--</span><span class="n">file</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">path</span> <span class="n">of</span> <span class="n">workflow</span> <span class="n">file</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>          <span class="n">help</span> <span class="k">for</span> <span class="n">workflow</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="vineyardctl-schedule-workload">
+<h2><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">schedule</span> <span class="pre">workload</span></code><a class="headerlink" href="#vineyardctl-schedule-workload" title="Permalink to this heading">#</a></h2>
+<p>Schedule the workload to a vineyard cluster</p>
+<div class="section" id="id57">
+<h3>Synopsis<a class="headerlink" href="#id57" title="Permalink to this heading">#</a></h3>
+<p>Schedule the workload to a vineyard cluster.
+It will add the podAffinity to the workload so that the workload
+will be scheduled to the vineyard cluster.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vineyardctl</span> <span class="n">schedule</span> <span class="n">workload</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>SEE ALSO</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#vineyardctl-schedule"><span class="xref myst">vineyardctl schedule</span></a>	 - Schedule a workload or a workflow to existing vineyard cluster.</p></li>
+</ul>
+</div>
+<div class="section" id="id58">
+<h3>Examples<a class="headerlink" href="#id58" title="Permalink to this heading">#</a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="c1"># Add the podAffinity to the workload for the specific vineyard cluster</span>
+<span class="w">  </span>vineyardctl<span class="w"> </span>schedule<span class="w"> </span>workload<span class="w"> </span>--resource<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;apiVersion&quot;: &quot;apps/v1&quot;,</span>
+<span class="s1">    &quot;kind&quot;: &quot;Deployment&quot;,</span>
+<span class="s1">    &quot;metadata&quot;: {</span>
+<span class="s1">      &quot;name&quot;: &quot;web-server&quot;</span>
+<span class="s1">    },</span>
+<span class="s1">    &quot;spec&quot;: {</span>
+<span class="s1">      &quot;selector&quot;: {</span>
+<span class="s1">      &quot;matchLabels&quot;: {</span>
+<span class="s1">        &quot;app&quot;: &quot;web-store&quot;</span>
+<span class="s1">      }</span>
+<span class="s1">      },</span>
+<span class="s1">      &quot;replicas&quot;: 3,</span>
+<span class="s1">      &quot;template&quot;: {</span>
+<span class="s1">      &quot;metadata&quot;: {</span>
+<span class="s1">        &quot;labels&quot;: {</span>
+<span class="s1">        &quot;app&quot;: &quot;web-store&quot;</span>
+<span class="s1">        }</span>
+<span class="s1">      },</span>
+<span class="s1">      &quot;spec&quot;: {</span>
+<span class="s1">        &quot;affinity&quot;: {</span>
+<span class="s1">        &quot;podAntiAffinity&quot;: {</span>
+<span class="s1">          &quot;requiredDuringSchedulingIgnoredDuringExecution&quot;: [</span>
+<span class="s1">          {</span>
+<span class="s1">            &quot;labelSelector&quot;: {</span>
+<span class="s1">            &quot;matchExpressions&quot;: [</span>
+<span class="s1">              {</span>
+<span class="s1">              &quot;key&quot;: &quot;app&quot;,</span>
+<span class="s1">              &quot;operator&quot;: &quot;In&quot;,</span>
+<span class="s1">              &quot;values&quot;: [</span>
+<span class="s1">                &quot;web-store&quot;</span>
+<span class="s1">              ]</span>
+<span class="s1">              }</span>
+<span class="s1">            ]</span>
+<span class="s1">            },</span>
+<span class="s1">            &quot;topologyKey&quot;: &quot;kubernetes.io/hostname&quot;</span>
+<span class="s1">          }</span>
+<span class="s1">          ]</span>
+<span class="s1">        },</span>
+<span class="s1">        &quot;podAffinity&quot;: {</span>
+<span class="s1">          &quot;requiredDuringSchedulingIgnoredDuringExecution&quot;: [</span>
+<span class="s1">          {</span>
+<span class="s1">            &quot;labelSelector&quot;: {</span>
+<span class="s1">            &quot;matchExpressions&quot;: [</span>
+<span class="s1">              {</span>
+<span class="s1">              &quot;key&quot;: &quot;app&quot;,</span>
+<span class="s1">              &quot;operator&quot;: &quot;In&quot;,</span>
+<span class="s1">              &quot;values&quot;: [</span>
+<span class="s1">                &quot;store&quot;</span>
+<span class="s1">              ]</span>
+<span class="s1">              }</span>
+<span class="s1">            ]</span>
+<span class="s1">            },</span>
+<span class="s1">            &quot;topologyKey&quot;: &quot;kubernetes.io/hostname&quot;</span>
+<span class="s1">          }</span>
+<span class="s1">          ]</span>
+<span class="s1">        }</span>
+<span class="s1">        },</span>
+<span class="s1">        &quot;containers&quot;: [</span>
+<span class="s1">        {</span>
+<span class="s1">          &quot;name&quot;: &quot;web-app&quot;,</span>
+<span class="s1">          &quot;image&quot;: &quot;nginx:1.16-alpine&quot;</span>
+<span class="s1">        }</span>
+<span class="s1">        ]</span>
+<span class="s1">      }</span>
+<span class="s1">      }</span>
+<span class="s1">    }</span>
+<span class="s1">    }&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd-name<span class="w"> </span>vineyardd-sample<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--vineyardd-namespace<span class="w"> </span>vineyard-system
+</pre></div>
+</div>
+</div>
+<div class="section" id="id59">
+<h3>Options<a class="headerlink" href="#id59" title="Permalink to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                         <span class="n">help</span> <span class="k">for</span> <span class="n">workload</span>
+      <span class="o">--</span><span class="n">resource</span> <span class="n">string</span>              <span class="n">the</span> <span class="n">json</span> <span class="n">string</span> <span class="n">of</span> <span class="n">kubernetes</span> <span class="n">workload</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">-</span><span class="n">name</span> <span class="n">string</span>        <span class="n">the</span> <span class="n">namespace</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">cluster</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyardd-sample&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">vineyardd</span><span class="o">-</span><span class="n">namespace</span> <span class="n">string</span>   <span class="n">the</span> <span class="n">namespace</span> <span class="n">of</span> <span class="n">vineyard</span> <span class="n">cluster</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;vineyard-system&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+        </article>
+      </div>
+      <footer>
+        
+<div class="related-pages">
+  <a class="next-page" href="../../tutorials/data-processing.html">
+      <div class="page-info">
+        <div class="context">
+          <span>Next</span>
+        </div>
+        <div class="title">Data processing</div>
+      </div>
+      <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+    </a>
+  <a class="prev-page" href="vineyard-operator.html">
+      <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+      <div class="page-info">
+        <div class="context">
+          <span>Previous</span>
+        </div>
+        
+        <div class="title">Vineyard Operator</div>
+        
+      </div>
+    </a>
+</div>
+
+<!-- index page doesn't have prev -->
+  <hr/>
+
+  <script src="https://giscus.app/client.js"
+    data-repo="v6d-io/v6d"
+    data-repo-id="MDEwOlJlcG9zaXRvcnkzMDY2MzEyMTE="
+    data-category="General"
+    data-category-id="MDE4OkRpc2N1c3Npb25DYXRlZ29yeTMyNDA3MTg2"
+    data-mapping="pathname"
+    data-strict="1"
+    data-reactions-enabled="0"
+    data-emit-metadata="0"
+    data-input-position="bottom"
+    data-theme="light"
+    data-lang="en"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async>
+  </script>
+
+<div class="bottom-of-page">
+  <div class="left-details">
+    <div class="copyright">
+        Copyright &#169; 2020-2023, The Vineyard Authors
+    </div>
+    Rendered with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/pradyunsg/furo">Furo</a>
+    <p>The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation,
+       please see our <a href="https://www.linuxfoundation.org/trademark-usage/">Trademark Usage page</a>.
+    </p>
+  </div>
+  <div class="right-details">
+    <div class="icons"><a class="muted-link" href="https://github.com//" aria-label="On GitHub">
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+        </svg>
+      </a>
+    </div>
+    <div>
+      <a href="https://www.cncf.io/sandbox-projects/"><img src="https://v6d.io/_static/cncf-color.svg" alt="CLOUD NATIVE COMPUTING FOUNDATION" width="100%" style="max-width: 200px;"/></p>
+    </div>
+  </div>
+</div>
+
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span></code></a><ul>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#options">Options</a></li>
+<li><a class="reference internal" href="#vineyardctl-create"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">create</span></code></a><ul>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#id1">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-create-backup"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">create</span> <span class="pre">backup</span></code></a><ul>
+<li><a class="reference internal" href="#id2">Synopsis</a></li>
+<li><a class="reference internal" href="#id3">Examples</a></li>
+<li><a class="reference internal" href="#id4">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-create-operation"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">create</span> <span class="pre">operation</span></code></a><ul>
+<li><a class="reference internal" href="#id5">Synopsis</a></li>
+<li><a class="reference internal" href="#id6">Examples</a></li>
+<li><a class="reference internal" href="#id7">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-create-recover"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">create</span> <span class="pre">recover</span></code></a><ul>
+<li><a class="reference internal" href="#id8">Synopsis</a></li>
+<li><a class="reference internal" href="#id9">Examples</a></li>
+<li><a class="reference internal" href="#id10">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-delete"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span></code></a><ul>
+<li><a class="reference internal" href="#id11">Examples</a></li>
+<li><a class="reference internal" href="#id12">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-delete-backup"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">backup</span></code></a><ul>
+<li><a class="reference internal" href="#id13">Synopsis</a></li>
+<li><a class="reference internal" href="#id14">Examples</a></li>
+<li><a class="reference internal" href="#id15">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-delete-cert-manager"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">cert-manager</span></code></a><ul>
+<li><a class="reference internal" href="#id16">Synopsis</a></li>
+<li><a class="reference internal" href="#id17">Examples</a></li>
+<li><a class="reference internal" href="#id18">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-delete-operation"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">operation</span></code></a><ul>
+<li><a class="reference internal" href="#id19">Examples</a></li>
+<li><a class="reference internal" href="#id20">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-delete-operator"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">operator</span></code></a><ul>
+<li><a class="reference internal" href="#id21">Examples</a></li>
+<li><a class="reference internal" href="#id22">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-delete-recover"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">recover</span></code></a><ul>
+<li><a class="reference internal" href="#id23">Examples</a></li>
+<li><a class="reference internal" href="#id24">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-delete-vineyard-cluster"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">vineyard-cluster</span></code></a><ul>
+<li><a class="reference internal" href="#id25">Examples</a></li>
+<li><a class="reference internal" href="#id26">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-delete-vineyard-deployment"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">vineyard-deployment</span></code></a><ul>
+<li><a class="reference internal" href="#id27">Examples</a></li>
+<li><a class="reference internal" href="#id28">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-delete-vineyardd"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">delete</span> <span class="pre">vineyardd</span></code></a><ul>
+<li><a class="reference internal" href="#id29">Examples</a></li>
+<li><a class="reference internal" href="#id30">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-deploy"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">deploy</span></code></a><ul>
+<li><a class="reference internal" href="#id31">Examples</a></li>
+<li><a class="reference internal" href="#id32">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-deploy-cert-manager"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">deploy</span> <span class="pre">cert-manager</span></code></a><ul>
+<li><a class="reference internal" href="#id33">Synopsis</a></li>
+<li><a class="reference internal" href="#id34">Examples</a></li>
+<li><a class="reference internal" href="#id35">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-deploy-operator"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">deploy</span> <span class="pre">operator</span></code></a><ul>
+<li><a class="reference internal" href="#id36">Synopsis</a></li>
+<li><a class="reference internal" href="#id37">Examples</a></li>
+<li><a class="reference internal" href="#id38">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-deploy-vineyard-cluster"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">deploy</span> <span class="pre">vineyard-cluster</span></code></a><ul>
+<li><a class="reference internal" href="#id39">Examples</a></li>
+<li><a class="reference internal" href="#id40">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-deploy-vineyard-deployment"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">deploy</span> <span class="pre">vineyard-deployment</span></code></a><ul>
+<li><a class="reference internal" href="#id41">Synopsis</a></li>
+<li><a class="reference internal" href="#id42">Examples</a></li>
+<li><a class="reference internal" href="#id43">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-deploy-vineyardd"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">deploy</span> <span class="pre">vineyardd</span></code></a><ul>
+<li><a class="reference internal" href="#id44">Synopsis</a></li>
+<li><a class="reference internal" href="#id45">Examples</a></li>
+<li><a class="reference internal" href="#id46">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-inject"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">inject</span></code></a><ul>
+<li><a class="reference internal" href="#id47">Synopsis</a></li>
+<li><a class="reference internal" href="#id48">Examples</a></li>
+<li><a class="reference internal" href="#id49">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-manager"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">manager</span></code></a><ul>
+<li><a class="reference internal" href="#id50">Examples</a></li>
+<li><a class="reference internal" href="#id51">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-schedule"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">schedule</span></code></a><ul>
+<li><a class="reference internal" href="#id52">Examples</a></li>
+<li><a class="reference internal" href="#id53">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-schedule-workflow"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">schedule</span> <span class="pre">workflow</span></code></a><ul>
+<li><a class="reference internal" href="#id54">Synopsis</a></li>
+<li><a class="reference internal" href="#id55">Examples</a></li>
+<li><a class="reference internal" href="#id56">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vineyardctl-schedule-workload"><code class="docutils literal notranslate"><span class="pre">vineyardctl</span> <span class="pre">schedule</span> <span class="pre">workload</span></code></a><ul>
+<li><a class="reference internal" href="#id57">Synopsis</a></li>
+<li><a class="reference internal" href="#id58">Examples</a></li>
+<li><a class="reference internal" href="#id59">Options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/scripts/furo.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>
